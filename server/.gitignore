@@ -1,0 +1,6 @@
+.env
+schema.sql
+go.mod
+go.sum
+note.txt
+tags

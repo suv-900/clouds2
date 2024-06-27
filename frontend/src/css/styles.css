@@ -1,0 +1,153 @@
+/* Basic reset for box-sizing */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Body styles */
+body {
+    background-color: #f7f6f6;
+    color: rgb(64, 64, 64);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow:auto;
+    height: 100%;
+}
+
+/* Container for each post */
+.post {
+    max-width: 600px;
+    text-align: left;
+    margin: 20px auto;
+    background-color: #fff;
+    border: 2px solid #6a6a6a;
+    padding: 20px;
+}
+
+.post-header {
+    margin-bottom: 15px;
+}
+
+/* Title of the post */
+.post-title {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #383838;
+    text-decoration: solid;
+    margin-bottom: 10px;
+}
+
+/* Username of the person who posted */
+.post-username {
+    font-size: 1.2em;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Content section of the post */
+.post-content {
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.post-footer .comment {
+    font-size: 0.9em; /* Slightly smaller font size */
+    color: #777;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Likes count */
+.post-likes .comment-likes {
+    font-weight: bold;
+    text-decoration: solid;
+    color: #383838;
+}
+
+/* Like button */
+.like-button {
+    padding: 2px 6px; /* Reduced padding */
+    cursor: pointer;
+    border-radius: 5px;
+    /* transition: background-color 0.3s; */
+}
+
+.comments-section {
+    width: 80%;
+    margin: 20px 0;
+}
+
+.comments-title {
+    font-size: 1.3em; /* Slightly smaller font size */
+    color: #000;
+    margin-bottom: 8px; /* Reduced margin */
+    border-bottom: 1px solid #000;
+    padding-bottom: 5px;
+}
+
+/* Comment styles */
+.comment {
+    margin-top: 8px; /* Reduced margin */
+    padding: 8px; /* Reduced padding */
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* Reduced shadow */
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px; /* Reduced margin */
+    border-bottom: 1px solid #ccc; /* Lighter border */
+    padding-bottom: 4px; /* Reduced padding */
+    background-color: #f0f0f0; /* Slightly lighter background */
+    padding: 4px; /* Reduced padding */
+}
+
+.comment-username {
+    font-size: 0.9em; /* Slightly smaller font size */
+    color: #383838;
+}
+
+.comment-content {
+    margin: 8px 0; /* Reduced margin */
+    font-size: 0.9em; /* Slightly smaller font size */
+    color: #383838;
+    color: #110cff;
+    line-height: 1.4; /* Slightly reduced line height */
+}
+
+/* Comment footer */
+.comment-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-text {
+    font-size: 2em; /* Adjust as needed */
+    margin: 20px 0; /* Add spacing above and below the text */
+    letter-spacing: 2px; /* Adjust spacing between letters */
+    word-spacing: 5px; /* Adjust spacing between words */
+    text-align: center; /* Center align the text */
+}
+
+[class*=classic]:before {
+  content:"Loading...";
+}
+.classic-2 {
+  font-weight: bold;
+  font-family: sans-serif;
+  font-size: 30px;
+  padding-bottom: 8px;
+  background:linear-gradient(currentColor 0 0) 0 100%/0% 3px no-repeat;
+  animation:c2 2s linear infinite;
+}
+@keyframes c2 {to{background-size: 100% 3px}}
