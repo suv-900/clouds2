@@ -1,6 +1,6 @@
 import React, { useState,useEffect } from 'react'
 import {useNavigate} from 'react-router-dom'
-import { checkEmail, checkPassword } from '../../utils';
+import { checkEmail, checkPassword } from '../../utils/utils';
 import { FormError } from '../errors/FormErrors';
 import Loading from '../Loading';
 

@@ -43,72 +43,45 @@ func GetallpostsbyUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
-	var authorid uint64
-	var tokenExpired bool
-	var tokenInvalid bool
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, authorid, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-	}()
-	<-a
 
-	if tokenExpired {
+	tokenExpired, authorid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	if tokenExpired || tokenInvalid {
 		w.WriteHeader(401)
 		return
 	}
-	if tokenInvalid {
+
+	rbyte, err := io.ReadAll(r.Body)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	var post models.Posts
+	err = json.Unmarshal(rbyte, &post)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	if post.Post_content == "" || post.Post_title == "" {
 		w.WriteHeader(400)
 		return
 	}
 
-	pipe2 := make(chan bool, 1)
-	var post models.Posts
-
-	var postid uint64
-	go func() {
-		rbyte, err := io.ReadAll(r.Body)
-		if err != nil {
-			serverError(&w, err)
-			fmt.Println("error while reading request.")
-			pipe2 <- false
-			return
-		}
-		err = json.Unmarshal(rbyte, &post)
-		if err != nil {
-			serverError(&w, err)
-			fmt.Println("error while unmarshalling data")
-			pipe2 <- false
-			return
-		}
-		post.Author_id = authorid
-		post.CreatedAt = time.Now()
-		postid, err = models.CreatePost(post)
-		if err != nil {
-			serverError(&w, err)
-			fmt.Println("error while creating post")
-			pipe2 <- false
-			return
-		}
-		pipe2 <- true
-	}()
-
-	if !<-pipe2 {
-		fmt.Println("post creation failed")
+	post.Author_id = authorid
+	post.CreatedAt = time.Now()
+	postid, err := models.CreatePost(post)
+	if err != nil {
+		serverError(&w, err)
 		return
 	}
-	w.WriteHeader(200)
 
 	parsedres, err := json.Marshal(postid)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
-	//b := make([]byte, 8)
-	//binary.LittleEndian.PutUint64(b, postid)
+	w.WriteHeader(200)
 	w.Write(parsedres)
-	// var userPosts []models.Posts
-	// userPosts = models.CreatePost(post.Username, post)
+
 }
 
 func DeletePost(w http.ResponseWriter, r *http.Request) {
@@ -239,11 +212,7 @@ func GetPostByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	comments, err := models.Get5CommentsByPostID(postid)
-	if err != nil {
-		serverError(&w, err)
-		return
-	}
+	comments := models.GetAllCommentsByPostID(postid)
 
 	finalRes := models.PostandComments{Post: post, Comments: comments}
 	parsedRes, err := json.Marshal(finalRes)
@@ -358,7 +327,7 @@ func LikePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//save user prefrence
-	err = models.LikePostByID(userid, postid)
+	err = models.LikePost(userid, postid)
 	if err != nil {
 		serverError(&w, err)
 		return

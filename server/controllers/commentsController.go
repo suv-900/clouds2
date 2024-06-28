@@ -6,6 +6,7 @@ import (
 	"io"
 	"strconv"
 	"sync"
+	"time"
 
 	"net/http"
 
@@ -15,18 +16,8 @@ import (
 )
 
 func AddComment(w http.ResponseWriter, r *http.Request) {
-	var userid uint64
-	var username string
-	var tokenInvalid bool
-	var tokenExpired bool
 
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, userid, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-	}()
-	<-a
-
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenExpired {
 		w.WriteHeader(401)
 		return
@@ -36,55 +27,49 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d := make(chan int, 1)
-	go func() {
-		username = models.GetUsername(userid)
-		d <- 1
-	}()
-	<-d
+	//login,register
+	//home,viewpost,comments,likepost,likecomment etc
+	//addcomment
+	//createpost
+	username := models.GetUsername(userid)
 
 	var postid uint64
-	var comment string
-	b := make(chan bool, 1)
-	go func() {
-		rbody, err := io.ReadAll(r.Body)
-		if err != nil {
-			serverError(&w, err)
-			b <- false
-			return
-		}
-		json.Unmarshal(rbody, &comment)
-		vars := mux.Vars(r)
-		postidstr := vars["id"]
-		fmt.Println(postidstr)
-		postid, err = strconv.ParseUint(postidstr, 10, 64)
-		if err != nil {
-			serverError(&w, err)
-			b <- false
-			return
-		}
-		b <- true
-	}()
-	if !<-b {
+	var comment_content string
+	rbody, err := io.ReadAll(r.Body)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	json.Unmarshal(rbody, &comment_content)
+
+	vars := mux.Vars(r)
+	postidstr := vars["id"]
+	postid, err = strconv.ParseUint(postidstr, 10, 64)
+	if err != nil {
+		serverError(&w, err)
 		return
 	}
 
-	c := make(chan bool, 1)
-	go func() {
-		err := models.AddComment(postid, userid, username, comment)
-		if err != nil {
-			serverError(&w, err)
-			c <- false
-			return
-		}
-		c <- true
-	}()
-	if !<-c {
+	commentID, err := models.AddComment(postid, userid, username, comment_content)
+	if err != nil {
+		serverError(&w, err)
 		return
 	}
-	//not sending back comment string use in frontend
-
+	comment := models.Comment{
+		Comment_id:      commentID,
+		User_id:         userid,
+		Comment_content: comment_content,
+		Username:        username,
+		CreatedAt:       time.Now(),
+		Comment_likes:   0,
+	}
+	reply, err := json.Marshal(comment)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
 	w.WriteHeader(200)
+	w.Write(reply)
 }
 
 func FetchComments(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +80,7 @@ func FetchComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var offset uint16
-	json.Unmarshal(rbody, offset)
+	json.Unmarshal(rbody, &offset)
 
 	var wg sync.WaitGroup
 

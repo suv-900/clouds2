@@ -6,41 +6,23 @@ import (
 )
 
 func CreatePost(post Posts) (uint64, error) {
-	var postid uint64
-	pipe := make(chan bool, 1)
-	var err error
-	var userexists bool
 
-	a := make(chan int, 1)
-	go func() {
-		r := CheckUserExists(post.Author_id)
-		userexists = r
-		a <- 1
-	}()
-	<-a
+	userexists := CheckUserExists(post.Author_id)
 	if !userexists {
 		fmt.Println("User doesnt exists.Post Creation Failed")
 		return 0, errors.New("user doesnt exists.Post Creation Failed")
 	}
 
-	go func() {
-		tx := db.Begin()
-		result := tx.Exec("INSERT INTO posts (post_title,post_content,author_id,post_likes) VALUES(?,?,?,?) RETURNING post_id", post.Post_title, post.Post_content, post.Author_id, 0).Scan(&postid)
-		if result.Error != nil {
-			tx.Rollback()
-			err = result.Error
-			postid = 0
-			pipe <- false
-			return
-		} else {
-			tx.Commit()
-			err = nil
-			pipe <- true
-			return
-		}
-	}()
-	<-pipe
-	return postid, err
+	var postid uint64
+	tx := db.Begin()
+	r := tx.Raw("INSERT INTO posts (post_title,post_content,author_id,post_likes) VALUES(?,?,?,?) RETURNING post_id", post.Post_title, post.Post_content, post.Author_id, 0).Scan(&postid)
+	if r.Error != nil {
+		tx.Rollback()
+		return postid, r.Error
+	} else {
+		tx.Commit()
+	}
+	return postid, nil
 }
 
 // deletes a post
@@ -137,59 +119,60 @@ func PostById(postid uint64) (Posts, error) {
 	return post, r.Error
 }
 
-func LikePostByID(userid uint64, postid uint64) error {
-	var err error
+// server should be dumb and do what said nothing extra
+// func LikePostByID(userid uint64, postid uint64) error {
+// 	var err error
 
-	c := make(chan int, 1)
-	go func() {
-		r := db.Exec("DELETE FROM posts_disliked_by_user WHERE user_id=? AND post_id=?", userid, postid)
-		if r.Error != nil {
-			err = r.Error
-			c <- 1
-			return
-		}
-		c <- 1
-	}()
-	<-c
+// 	c := make(chan int, 1)
+// 	go func() {
+// 		r := db.Exec("DELETE FROM posts_disliked_by_user WHERE user_id=? AND post_id=?", userid, postid)
+// 		if r.Error != nil {
+// 			err = r.Error
+// 			c <- 1
+// 			return
+// 		}
+// 		c <- 1
+// 	}()
+// 	<-c
 
-	if err != nil {
-		return err
-	}
+// 	if err != nil {
+// 		return err
+// 	}
 
-	a := make(chan int, 1)
-	go func() {
-		tx := db.Begin()
-		r := tx.Exec("UPDATE posts SET post_likes=post_likes+1 WHERE post_id=?", postid)
-		if r.Error != nil {
-			err = r.Error
-			a <- 1
-			tx.Rollback()
-			return
-		}
-		tx.Commit()
-		a <- 1
-	}()
-	<-a
-	if err != nil {
-		return err
-	}
+// 	a := make(chan int, 1)
+// 	go func() {
+// 		tx := db.Begin()
+// 		r := tx.Exec("UPDATE posts SET post_likes=post_likes+1 WHERE post_id=?", postid)
+// 		if r.Error != nil {
+// 			err = r.Error
+// 			a <- 1
+// 			tx.Rollback()
+// 			return
+// 		}
+// 		tx.Commit()
+// 		a <- 1
+// 	}()
+// 	<-a
+// 	if err != nil {
+// 		return err
+// 	}
 
-	b := make(chan int, 1)
-	go func() {
-		tx := db.Begin()
-		r := tx.Exec("INSERT INTO posts_liked_by_user (user_id,post_id,liked) VALUES(?,?,?)", userid, postid, true)
-		if r.Error != nil {
-			err = r.Error
-			b <- 1
-			tx.Rollback()
-			return
-		}
-		tx.Commit()
-		b <- 1
-	}()
-	<-b
-	return err
-}
+// 	b := make(chan int, 1)
+// 	go func() {
+// 		tx := db.Begin()
+// 		r := tx.Exec("INSERT INTO posts_liked_by_user (user_id,post_id,liked) VALUES(?,?,?)", userid, postid, true)
+// 		if r.Error != nil {
+// 			err = r.Error
+// 			b <- 1
+// 			tx.Rollback()
+// 			return
+// 		}
+// 		tx.Commit()
+// 		b <- 1
+// 	}()
+// 	<-b
+// 	return err
+// }
 
 func RemoveLikeFromPost(userid uint64, postid uint64) error {
 	r := db.Exec("UPDATE posts SET post_likes=post_likes-1 WHERE post_id=?", postid)

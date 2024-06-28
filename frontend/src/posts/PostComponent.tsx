@@ -20,9 +20,9 @@ export default function PostComponent(props:{
                 tokenFound={props.tokenFound} 
                 postContent={props.post}               
             />
-            <CommentBox postid={props.post?props.post.id:undefined} />
             <PostComments 
                 comments={props.comments}
+                postid={props.post?props.post.id:undefined}
             />
 
         </div>
