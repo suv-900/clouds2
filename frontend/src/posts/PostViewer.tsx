@@ -5,7 +5,6 @@ import Loading from "../components/Loading";
 import PostComponent from "./PostComponent";
 
 export default function PostViewer(){
-    const[token,setToken] = useState("");
     const[tokenFound,setTokenFound] = useState(false);
     const[loading,setLoading] = useState(true);
     const[clientError,setClientError] = useState(false);
@@ -13,12 +12,6 @@ export default function PostViewer(){
     const[comments,setComments] = useState<Comment[]>([]);
     
     useEffect(()=>{
-        const t = localStorage.getItem("token");
-        if(t !== null){
-            setTokenFound(true);
-            setToken(t);
-        }
-
         const queryparams = new URLSearchParams(window.location.search);
         const i = queryparams.get("id"); 
         
@@ -31,9 +24,12 @@ export default function PostViewer(){
     },[])
 
     async function getPost(postid:number ){
-        if(tokenFound){
+        
+        const token = localStorage.getItem("token");
+
+        if(token !== null){
             const requestHeaders = {
-                "Authorization":`${token}`
+                "Authorization":token
             }
             const response = await fetch(`http://localhost:8000/viewPostToken/${postid}`,{
                 headers:requestHeaders,
@@ -41,8 +37,9 @@ export default function PostViewer(){
             })
             if(response.ok){
                 const res= await response.json();
+                console.log(res);
                 const k = res.Post;
-
+                
                 const post = new Post(
                     k.Post_id,
                     k.Post_title,
@@ -50,6 +47,8 @@ export default function PostViewer(){
                     k.Author_name,
                     k.Author_id,
                     k.Post_likes,
+                    res.PostLikedByUser,
+                    res.PostDislikedByUser,
                     k.Createdat
                 )
                 setPost(post);
@@ -89,6 +88,8 @@ export default function PostViewer(){
                     k.Author_name,
                     k.Author_id,
                     k.Post_likes,
+                    false,
+                    false,
                     k.Createdat
                 )
                 setPost(post);

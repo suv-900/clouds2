@@ -1,23 +1,5 @@
 package models
 
-import (
-	"fmt"
-)
-
-func LikePost(postid uint64, userid uint64) error {
-	tx := db.Begin()
-	r := tx.Exec("INSERT INTO like_posts (user_id,post_id) VALUES(?,?)", userid, postid)
-	if r.Error != nil {
-		tx.Rollback()
-		fmt.Println("Error occured while inserting like to like_posts %w", r.Error)
-		return r.Error
-	}
-
-	db.Exec("UPDATE posts SET num_likes=num_likes+1 WHERE post_id=?", postid)
-
-	return nil
-}
-
 // call responsively
 func LikeAComment(commentid uint64) {
 	db.Exec("UPDATE comments SET comment_likes=comment_likes+1 WHERE comment_id=?", commentid)

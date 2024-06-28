@@ -35,6 +35,12 @@ func DeletePost(postid uint64) error {
 	return nil
 }
 
+func GetAllPosts() []Posts {
+	var posts []Posts
+	db.Raw("SELECT * FROM posts").Scan(&posts)
+	return posts
+}
+
 func UpdatePost(postid uint64, post Posts) error {
 
 	tx := db.Begin()
@@ -60,54 +66,41 @@ func GetPosts(offset uint64) []Posts {
 	return posts
 }
 
-func GetPostAndUserPreferences(postid uint64, userid uint64) (Posts, string, error) {
-	var post Posts
-	var err error
-	var username string
-	a := make(chan int, 1)
-	go func() {
-		r := db.Raw("SELECT post_title,post_content,author_id,post_likes FROM posts WHERE post_id=?", postid).Scan(&post)
-		err = r.Error
-		a <- 1
-	}()
-	<-a
-	if err != nil {
-		return post, username, err
-	}
+// func GetPostAndUserPreferences(postid uint64, userid uint64) (Posts, error) {
+// 	var post Posts
+// 	r := db.Raw("SELECT * FROM posts WHERE post_id=?", postid).Scan(&post)
+// 	if r.Error != nil {
+// 		return post,r.Error
+// 	}
+// 	return post, nil
+// }
 
-	b := make(chan int, 1)
-	go func() {
-		r := db.Raw("SELECT username FROM users WHERE user_id=?", post.Author_id).Scan(&username)
-		err = r.Error
-		b <- 1
-	}()
-	<-b
-	if err != nil {
-		return post, username, err
-	}
-
-	return post, username, nil
-}
-
-func Check_if_user_likedPost(userid uint64, postid uint64) (bool, bool, error) {
+func CheckUserReaction(userid uint64, postid uint64) (bool, bool, error) {
 	var userLikedPost bool
 	var userDislikedPost bool
+	var count1 int
+	var count2 int
 	var err error
-	a := make(chan int, 1)
-	go func() {
+	r := db.Raw("SELECT COUNT(*) from posts_liked_by_users WHERE user_id=? AND post_id=?", userid, postid).Scan(&count1)
+	if r.Error != nil {
+		return userLikedPost, userDislikedPost, r.Error
+	}
+	r = db.Raw("SELECT COUNT(*) FROM posts_disliked_by_users WHERE user_id=? AND post_id=?", userid, postid).Scan(&count2)
+	if r.Error != nil {
+		return userLikedPost, userDislikedPost, r.Error
+	}
 
-		r := db.Raw("SELECT liked from posts_liked_by_user WHERE user_id=? AND post_id=?", userid, postid).Scan(&userLikedPost)
-		if r.Error != nil {
-			err = r.Error
-			a <- 1
-			return
-		}
-		db.Raw("SELECT disliked FROM posts_disliked_by_user WHERE user_id=? AND post_id=?", userid, postid).Scan(&userDislikedPost)
-		err = r.Error
-		a <- 1
-	}()
-	<-a
+	if count1 == 1 && count2 == 2 {
+		return userLikedPost, userDislikedPost, errors.New("illegalState:User reaction like and dislike both exists.check CheckUserReaction() function")
+	}
 
+	if count1 == 1 {
+		userLikedPost = true
+		userDislikedPost = false
+	} else if count2 == 1 {
+		userLikedPost = false
+		userDislikedPost = true
+	}
 	return userLikedPost, userDislikedPost, err
 }
 func PostById(postid uint64) (Posts, error) {
@@ -174,84 +167,87 @@ func PostById(postid uint64) (Posts, error) {
 // 	return err
 // }
 
-func RemoveLikeFromPost(userid uint64, postid uint64) error {
-	r := db.Exec("UPDATE posts SET post_likes=post_likes-1 WHERE post_id=?", postid)
+func LikePost(postid uint64, userid uint64) error {
+	tx := db.Begin()
+	r := tx.Exec("INSERT INTO posts_liked_by_users(user_id,post_id) VALUES(?,?) ", userid, postid)
 	if r.Error != nil {
+		tx.Rollback()
 		return r.Error
+	} else {
+		tx.Commit()
 	}
-	r = db.Exec("DELETE FROM posts_disliked_by_user WHERE post_id=? AND user_id=?", postid, userid)
+
+	tx = db.Begin()
+	r = tx.Exec("UPDATE posts SET post_likes= post_likes + 1 WHERE post_id=?", postid)
 	if r.Error != nil {
+		tx.Rollback()
 		return r.Error
+	} else {
+		tx.Commit()
 	}
 	return nil
 }
-func DislikePostByID(userid uint64, postid uint64) error {
-	var err error
 
-	c := make(chan int, 1)
-	go func() {
-		r := db.Exec("DELETE FROM posts_liked_by_user WHERE user_id=? AND post_id=?", userid, postid)
-		if r.Error != nil {
-			err = r.Error
-			c <- 1
-			return
-		}
-		c <- 1
-	}()
-	<-c
-
-	if err != nil {
-		return err
-	}
-
-	a := make(chan int, 1)
-	go func() {
-		tx := db.Begin()
-		r := tx.Exec("UPDATE posts SET post_likes=post_likes-1 WHERE post_id=?", postid)
-		if r.Error != nil {
-			err = r.Error
-			tx.Rollback()
-			a <- 1
-			return
-		}
-		tx.Commit()
-		a <- 1
-	}()
-	<-a
-
-	if err != nil {
-		return err
-	}
-
-	b := make(chan int, 1)
-	go func() {
-		tx := db.Begin()
-		r := tx.Exec("INSERT INTO posts_disliked_by_user (post_id,user_id,disliked) VALUES(?,?,?)", postid, userid, true)
-
-		if r.Error != nil {
-			err = r.Error
-			tx.Rollback()
-			b <- 1
-			return
-		}
-		tx.Commit()
-		b <- 1
-
-	}()
-	<-b
-	return err
-}
-func RemoveDislikeFromPost(userid uint64, postid uint64) error {
-	r := db.Exec("UPDATE posts SET post_likes=post_likes+1 WHERE post_id=?", postid)
+func DislikePost(postid uint64, userid uint64) error {
+	tx := db.Begin()
+	r := tx.Exec("INSERT INTO posts_disliked_by_users(user_id,post_id) VALUES(?,?) ", userid, postid)
 	if r.Error != nil {
+		tx.Rollback()
 		return r.Error
+	} else {
+		tx.Commit()
 	}
-	r = db.Exec("DELETE FROM posts_disliked_by_user WHERE post_id=? AND user_id=?", postid, userid)
+
+	tx = db.Begin()
+	r = tx.Exec("UPDATE posts SET post_likes=post_likes - 1 WHERE post_id=?", postid)
 	if r.Error != nil {
+		tx.Rollback()
 		return r.Error
+	} else {
+		tx.Commit()
 	}
 	return nil
+}
+func RemoveLikeFromPost(postid uint64, userid uint64) error {
+	tx := db.Begin()
+	r := tx.Exec("DELETE FROM posts_liked_by_users WHERE user_id=? AND post_id=?", userid, postid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
 
+	tx = db.Begin()
+	r = tx.Exec("UPDATE posts SET post_likes=post_likes - 1 WHERE post_id=?", postid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+	return nil
+}
+
+func RemoveDislikeFromPost(postid uint64, userid uint64) error {
+	tx := db.Begin()
+	r := tx.Exec("DELETE FROM posts_disliked_by_users WHERE user_id=? AND post_id=?", userid, postid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+
+	tx = db.Begin()
+	r = tx.Exec("UPDATE posts SET post_likes=post_likes + 1 WHERE post_id=?", postid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+	return nil
 }
 
 func FeedGenerator(userid uint64) []Posts {

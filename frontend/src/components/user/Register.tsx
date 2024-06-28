@@ -106,9 +106,11 @@ export default function Register(){
     return(
         <div> 
         {!loading?
-        <div>
-            <label>username</label><br></br>
-            <input type="text" 
+        <div className="form-container">
+            <div className="form-title">Create your account</div>
+            <label className="form-label">username</label>
+            <input type="text"
+            className="form-input" 
             onChange={(e)=>{
                 if(e.target.value.length === 0){
                     setUsernameError(true);
@@ -120,11 +122,12 @@ export default function Register(){
             }}
             />
             <br></br>
-            <FormError render={usernameError} msg={usernameErrorMessage}/>
+            <FormError enable={usernameError} msg={usernameErrorMessage}/>
             <br></br>
             
-            <label>password</label><br></br>
+            <label className="form-label">password</label>
             <input type="password"
+            className="form-input"
             onChange={(e)=>{
                 // if(!checkPassword(e.target.value)){
                 //     setPasswordValid(false);
@@ -135,7 +138,7 @@ export default function Register(){
                 if(e.target.value.length === 0){
                     setPasswordValid(false);
                     setPasswordError(true);
-                    setPasswordErrorMessage("password cannot be blank");
+                    setPasswordErrorMessage("password cannot be blank.");
                     return;
                 }
                 setPasswordValid(true);
@@ -144,20 +147,21 @@ export default function Register(){
             }} 
             />
             <br></br>
-            <FormError render={passwordError} msg={passwordErrorMessage}/>
+            <FormError enable={passwordError} msg={passwordErrorMessage}/>
             <br></br>
 
-            <label>email</label><br></br>
+            <label className="form-label">email</label>
             <input type="email"
+            className="form-input"
             onChange={(e)=>{
                 if(e.target.value.length === 0){
                     setEmailError(true);
-                    setEmailErrorMessage("email cannot be blank");
+                    setEmailErrorMessage("email cannot be blank.");
                     return;
                 }
                 if(!checkEmail(e.target.value)){
                     setEmailError(true);
-                    setEmailErrorMessage("invalid email");
+                    setEmailErrorMessage("invalid email.");
                 }else{
                     setEmailError(false);
                     setEmail(e.target.value);
@@ -166,10 +170,10 @@ export default function Register(){
             }} 
             />
             <br></br>
-            <FormError render={emailError} msg={emailErrorMessage}/>
+            <FormError enable={emailError} msg={emailErrorMessage}/>
             <br></br>
             
-            <button onClick={()=>{register()}}
+            <button className="form-button" onClick={()=>{register()}}
             >register</button>
             
             {error && errorMessage ?<div>{errorMessage}</div>:<></>}

@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"time"
 
 	//"strconv"
 
@@ -65,9 +64,12 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		return
 	}
-
+	author_name := models.GetUsername(authorid)
 	post.Author_id = authorid
-	post.CreatedAt = time.Now()
+	post.Author_name = author_name
+
+	fmt.Println(post)
+
 	postid, err := models.CreatePost(post)
 	if err != nil {
 		serverError(&w, err)
@@ -195,6 +197,20 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 }
 
+func GetAllPosts(w http.ResponseWriter, r *http.Request) {
+
+	posts := models.GetAllPosts()
+
+	response, err := json.Marshal(posts)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	w.WriteHeader(200)
+	w.Write(response)
+
+}
+
 // sends post username and top 5 comments
 func GetPostByID(w http.ResponseWriter, r *http.Request) {
 	var postid uint64
@@ -228,14 +244,7 @@ func GetPostByID(w http.ResponseWriter, r *http.Request) {
 func GetPostByID_WithUserPreferences(w http.ResponseWriter, r *http.Request) {
 
 	var userid uint64
-	var tokenExpired bool
-	var tokenInvalid bool
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, userid, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-	}()
-	<-a
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenExpired {
 		w.WriteHeader(401)
 		return
@@ -255,43 +264,31 @@ func GetPostByID_WithUserPreferences(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	b := make(chan int, 1)
-	var post models.Posts
-	var username string
-	var userLikedPost bool
-	var userDislikedPost bool
-	go func() {
-		post, username, err = models.GetPostAndUserPreferences(postid, userid)
-		userLikedPost, userDislikedPost, err = models.Check_if_user_likedPost(userid, postid)
-		b <- 1
-	}()
-	<-b
-	fmt.Println(userLikedPost)
-	fmt.Println(userDislikedPost)
+	post, err := models.PostById(postid)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
 
-	c := make(chan int, 1)
-	var comments []models.UsernameAndComment
-	go func() {
-		comments, err = models.Get5CommentsByPostID(postid)
-		c <- 1
-	}()
-	<-c
+	userLikedPost, userDislikedPost, err := models.CheckUserReaction(userid, postid)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
 
-	finalResult := &models.PostUsernameComments_WithUserPreference{
+	comments := models.GetAllCommentsByPostID(postid)
+	// if err != nil {
+	// 	serverError(&w, err)
+	// 	return
+	// }
+
+	finalResult := &models.PostComments_WithUserPreference{
 		Post:               post,
-		Username:           username,
 		PostLikedByUser:    userLikedPost,
 		PostDislikedByUser: userDislikedPost,
 		Comments:           comments,
 	}
+
 	var jsonReply []byte
 	jsonReply, err = json.Marshal(finalResult)
 	if err != nil {
@@ -305,8 +302,6 @@ func GetPostByID_WithUserPreferences(w http.ResponseWriter, r *http.Request) {
 }
 func LikePost(w http.ResponseWriter, r *http.Request) {
 	var postid uint64
-	var err error
-	var userid uint64
 
 	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenExpired {
@@ -320,14 +315,14 @@ func LikePost(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	postidstr := vars["postid"]
-	postid, err = strconv.ParseUint(postidstr, 10, 64)
+	postid, err := strconv.ParseUint(postidstr, 10, 64)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
 
 	//save user prefrence
-	err = models.LikePost(userid, postid)
+	err = models.LikePost(postid, userid)
 	if err != nil {
 		serverError(&w, err)
 		return
@@ -336,19 +331,7 @@ func LikePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func DislikePost(w http.ResponseWriter, r *http.Request) {
-	var postid uint64
-	var err error
-	var tokenExpired bool
-	var tokenInvalid bool
-	var userid uint64
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, userid, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-
-		a <- 1
-	}()
-	<-a
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenExpired {
 		w.WriteHeader(401)
 	}
@@ -356,22 +339,18 @@ func DislikePost(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		return
 	}
+
+	var postid uint64
 	vars := mux.Vars(r)
 	postidstr := vars["postid"]
-	postid, err = strconv.ParseUint(postidstr, 10, 64)
+	postid, err := strconv.ParseUint(postidstr, 10, 64)
 	if err != nil {
 		serverError(&w, err)
-		a <- 1
 		return
 	}
 
 	//save user prefrence
-	b := make(chan int, 1)
-	go func() {
-		err = models.DislikePostByID(userid, postid)
-		b <- 1
-	}()
-	<-b
+	models.DislikePost(postid, userid)
 	if err != nil {
 		serverError(&w, err)
 		return
@@ -381,22 +360,12 @@ func DislikePost(w http.ResponseWriter, r *http.Request) {
 
 func RemoveLikeFromPost(w http.ResponseWriter, r *http.Request) {
 	var postid uint64
-	var userid uint64
 	var err error
-	var tokenExpired bool
-	var tokenInvalid bool
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, userid, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
 
-		a <- 1
-	}()
-	<-a
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenExpired {
 		w.WriteHeader(401)
 	}
-
 	if tokenInvalid {
 		w.WriteHeader(400)
 		return
@@ -406,62 +375,41 @@ func RemoveLikeFromPost(w http.ResponseWriter, r *http.Request) {
 	postid, err = strconv.ParseUint(postidstr, 10, 64)
 	if err != nil {
 		serverError(&w, err)
-		a <- 1
 		return
 	}
 
-	b := make(chan int, 1)
-	go func() {
-		err = models.RemoveLikeFromPost(userid, postid)
-		b <- 1
-	}()
-	<-b
+	err = models.RemoveLikeFromPost(postid, userid)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
-
 	w.WriteHeader(200)
 }
 func RemoveDislikeFromPost(w http.ResponseWriter, r *http.Request) {
 	var postid uint64
-	var err error
-	var tokenExpired bool
-	var tokenInvalid bool
-	var userid uint64
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, userid, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-	}()
-	<-a
+
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenExpired {
 		w.WriteHeader(401)
 	}
-
 	if tokenInvalid {
 		w.WriteHeader(400)
 		return
 	}
+
 	vars := mux.Vars(r)
 	postidstr := vars["postid"]
-	postid, err = strconv.ParseUint(postidstr, 10, 64)
+	postid, err := strconv.ParseUint(postidstr, 10, 64)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
 
-	b := make(chan int, 1)
-	go func() {
-		err = models.RemoveDislikeFromPost(userid, postid)
-		b <- 1
-	}()
-	<-b
+	err = models.RemoveDislikeFromPost(postid, userid)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
-
 	w.WriteHeader(200)
 }
 func TokenVerifier(s string, r *http.Request) (bool, *CustomPayload) {

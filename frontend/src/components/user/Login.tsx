@@ -2,6 +2,7 @@ import React, { useState,useEffect } from 'react'
 import {useNavigate} from 'react-router-dom'
 import MainPage from '../Home';
 import Loading from '../Loading';
+import { FormError } from '../errors/FormErrors';
 
 //disable button first render
 export default function Login(){
@@ -10,9 +11,8 @@ export default function Login(){
     const[username,setUsername] = useState<string>("");
     const[password,setPassword] = useState<string>("");
     const[loginSuccess,setLoginSuccess] = useState(false);
-    const[error,setError] = useState<boolean>();
+    const[error,setError] = useState(false);
     const[errorMessage,setErrorMessage] = useState<string>();
-    const[loading,setLoading] = useState(false);
     
     // const navigator = useNavigate();
     useEffect(()=>{
@@ -31,14 +31,7 @@ export default function Login(){
             setErrorMessage("");
         },3000)
     }
-    function saveToken(token:string){
-        setLoading(true);
-        localStorage.setItem("token",token);
-        setTimeout(()=>{
-            setLoading(false);
-            navigate("/home");
-        },4000)
-    }
+    
     async function login(){
         if(username.length === 0 || password.length === 0){
             displayError("invalid form");
@@ -53,9 +46,12 @@ export default function Login(){
             method:"POST"
         })
 
-        if(response.ok){
-            const token = await response.json()
-            saveToken(token);
+        if(response.status === 200){
+            const token = await response.json();
+            localStorage.setItem("token",token);
+            // setTimeout(()=>{
+            //     navigate("/home");
+            // },2000)
         }else if(response.status === 401){
             displayError("wrong password");
         }else if(response.status === 404){
@@ -68,20 +64,15 @@ export default function Login(){
     } 
 
     return(
-        <div >
-        {loading?<></>:   
-        <div className="login-form">
-            <label>username</label><br></br>
-            <input type="text" onChange={(e)=>{setUsername(e.target.value)}} /><br></br>
+        <div className="form-container">
+            <div className="form-title">Login to your account</div>
+            <label className="form-label">username</label>
+            <input type="text" className="form-input" onChange={(e)=>{setUsername(e.target.value)}} /><br></br>
             
-            <label>password</label><br></br>
-            <input type="text" onChange={(e)=>{setPassword(e.target.value)}} /><br></br>
-            
-            <button onClick={()=>{login()}}>login</button>
-            {error && errorMessage ?<div>{errorMessage}</div>:<></>}
-        </div>
-        }   
-        <Loading enable={loading}/>
+            <label className="form-label">password</label>
+            <input type="text" className="form-input" onChange={(e)=>{setPassword(e.target.value)}} /><br></br>
+            <FormError msg={errorMessage} enable={error}/>    
+            <button className="form-button" onClick={()=>{login()}}>login</button>
         </div>
     )
 }

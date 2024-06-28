@@ -67,12 +67,17 @@ export default function PostCule(props:{
     }
     return(
         <div>
-            <a href={postLink}>{post.title}</a>
-            <a href={authorLink} >{post.authorname}</a>
-            <div>{post.createdat}</div>
-            <div>{likes}</div>
-            <button onClick={()=>{likePost()}}>like</button>
-            <button onClick={()=>{dislikePost()}}>dislike</button>
+        <div className="post-container">
+            <a href={postLink}  target="_blank" className="post-link">{post.title}</a>
+            <a href={authorLink} className="author-name" >{post.authorname} author</a>
+            <div className="post-meta">
+                <div className="creation-date">{post.createdat}</div>
+                <div className="post-likes">{likes} likes</div>
+            </div>
+            <button className="like-button" onClick={()=>{likePost()}}>like</button>
+            <button className="dislike-button" onClick={()=>{dislikePost()}}>dislike</button>
+        </div>
+        <div className="post-separator"></div>
         </div>
     )
 }

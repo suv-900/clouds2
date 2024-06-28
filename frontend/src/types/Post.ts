@@ -5,6 +5,8 @@ export default class Post{
     authorname:string;
     authorid:number;
     likes:number;
+    postLiked:boolean;
+    postDisliked:boolean;
     createdat:string;
 
     constructor(
@@ -14,6 +16,8 @@ export default class Post{
         authorname:string,
         authorid:number,
         likes:number,
+        postLiked:boolean,
+        postDisliked:boolean,
         createdat:string
     ){
         this.id = id;
@@ -22,6 +26,8 @@ export default class Post{
         this.authorname = authorname;
         this.authorid = authorid;
         this.likes = likes;
+        this.postLiked = postLiked;
+        this.postDisliked = postDisliked;
         this.createdat = createdat;
     }
     

@@ -6,21 +6,23 @@ import CustomError from "../components/CustomError";
 export default function PostFooter(props:{
     tokenFound:boolean,
     likes:number,
+    postLiked:boolean,
+    postDisliked:boolean,
     postid:number
 }){
      
     const[displayError,setDisplayError] = useState(false);
     const[likes,setLikes] = useState(props.likes);
-    const[liked,setLiked] = useState(false);    
-    const[disliked,setDisliked] = useState(false);   
-
-    const tokenFound = props.tokenFound;
-
+    const[liked,setLiked] = useState(props.postLiked);    
+    const[disliked,setDisliked] = useState(props.postDisliked);   
+    const[tokenFound,setTokenFound] = useState(false);
     const[token,setToken] = useState<string>();
+    
     useEffect(()=>{
         const token = localStorage.getItem("token");
-        if(token){
+        if(token !== null){
             setToken(token);
+            setTokenFound(true);
         }
     },[])
     
@@ -38,7 +40,7 @@ export default function PostFooter(props:{
     }
 
     async function likePost(){
-        if(!props.tokenFound || token === undefined){
+        if(!tokenFound || token === undefined){
             renderErrorMessage();
             return;
         }
@@ -64,7 +66,7 @@ export default function PostFooter(props:{
         }
     }
     async function removeLike(){
-        if(!props.tokenFound || token === undefined){
+        if(!tokenFound || token === undefined){
             renderErrorMessage();
             return;
         }
@@ -88,7 +90,7 @@ export default function PostFooter(props:{
     }
     
     async function dislikePost(){
-        if(!props.tokenFound || token === undefined){
+        if(!tokenFound || token === undefined){
             setDisplayError(true);
             vanishErrorMessage();
             return;
@@ -116,8 +118,7 @@ export default function PostFooter(props:{
         }
     }
     async function removeDislike(){
-
-        if(!props.tokenFound || token === undefined){
+        if(!tokenFound || token === undefined){
             setDisplayError(true);
             vanishErrorMessage();
             return;

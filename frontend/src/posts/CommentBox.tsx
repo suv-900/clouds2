@@ -36,7 +36,9 @@ export default function CommentBox(props:{
         {tokenFound && props.postid?
         <div>
             <label>add comment</label>
-            <input type="text" onChange={(e)=>{setComment(e.target.value)}}/>
+            <textarea
+                onChange={(e)=>{setComment(e.target.value)}}
+                />
             <button onClick={()=>{addComment()}}>submit</button>
         </div>:<></>}
     </div>)

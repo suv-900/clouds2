@@ -61,10 +61,25 @@ export default function CreatePost(){
     return(
         <div className="create-post-container">
             <div className="create-post-form">
-                <label>title</label>
-                <input type="text"className="title-input" onChange={(e)=>{setTitle(e.target.value)}}/>
-                <label>body</label>
-                <input type="text" className="body-input" onChange={(e)=>{setBody(e.target.value)}}/>
+                <div className="create-post-title">Write a post</div>
+                <label className="create-post-label">title</label>
+                <textarea
+                    autoFocus
+                    maxLength={20} 
+                    className="title-input" 
+                    onChange={(e)=>{setTitle(e.target.value)}}
+                    placeholder="title..."
+                    wrap="soft"
+                />
+                
+                <label className="create-post-label">body</label>
+                <textarea
+                    rows={10}
+                    maxLength={10000} 
+                    className="body-input" 
+                    onChange={(e)=>{setBody(e.target.value)}}
+                    placeholder="Write your post..."
+                />
                 <button className="submit-button" onClick={()=>{createPost()}}>create</button>
                 <div>{displayError?error:""}</div>
             </div>

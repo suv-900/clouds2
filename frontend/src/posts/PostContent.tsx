@@ -22,7 +22,12 @@ export default function PostContent(props:{
                 </div>
                 <p className="post-content">{post.content}</p>
                 <div className="post-footer">
-                   <PostFooter tokenFound={props.tokenFound} postid={post.id} likes={post.likes} /> 
+                   <PostFooter tokenFound={props.tokenFound} 
+                   postid={post.id} 
+                   likes={post.likes} 
+                   postLiked={post.postLiked}
+                   postDisliked={post.postDisliked}
+                   /> 
                 </div>
             </div>
             <div>
