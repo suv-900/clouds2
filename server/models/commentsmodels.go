@@ -1,11 +1,11 @@
 package models
 
 // call responsively
-func LikeAComment(commentid uint64) {
+func LikeComment(commentid uint64) {
 	db.Exec("UPDATE comments SET comment_likes=comment_likes+1 WHERE comment_id=?", commentid)
 }
 
-func DislikeAComment(commentid uint64) {
+func DislikeComment(commentid uint64) {
 	db.Exec("UPDATE comments SET comment_likes=comment_likes-1 WHERE comment_id=?", commentid)
 }
 
@@ -41,12 +41,12 @@ func Get5CommentsByPostID(postid uint64) ([]UsernameAndComment, error) {
 	*/
 }
 
-func GetAllCommentsByPostID(postid uint64) []UsernameAndComment {
-	commentsvec := []UsernameAndComment{}
+func GetAllCommentsByPostID(postid uint64) []Comment {
+	var comments []Comment
 	//TODO OFFSET to hold a bar for next comments
-	sql := "SELECT comment_id,user_id,username,comment_content,comment_likes FROM comments WHERE post_id=? ORDER BY comment_likes DESC "
-	db.Raw(sql, postid).Scan(&commentsvec)
-	return commentsvec
+	sql := "SELECT * FROM comments WHERE post_id=? ORDER BY comment_likes DESC "
+	db.Raw(sql, postid).Scan(&comments)
+	return comments
 }
 
 func AddComment(postid uint64, userid uint64, username string, comment_content string) (uint64, error) {

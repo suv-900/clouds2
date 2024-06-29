@@ -58,11 +58,12 @@ export default function PostViewer(){
                 for(let i =0;i<c.length;i++){
                     const b = c[i];
                     const comment = new Comment(
-                        b.CommentID,
+                        b.Comment_id,
                         b.User_id,
                         b.Username,
                         b.Comment_content,
                         b.Comment_likes,
+                        b.CreatedAt
                     )
                     commentsarr.push(comment);
                 }
@@ -99,11 +100,12 @@ export default function PostViewer(){
                 for(let i =0;i<c.length;i++){
                     const b = c[i];
                     const comment = new Comment(
-                        b.CommentID,
+                        b.Comment_id,
                         b.User_id,
                         b.Username,
                         b.Comment_content,
                         b.Comment_likes,
+                        b.CreatedAt
                     )
                     commentsarr.push(comment);
                 }

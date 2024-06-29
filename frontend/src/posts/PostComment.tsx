@@ -6,7 +6,8 @@ export default function PostComment(props:{
     content:string,
     authorname:string,
     authorid:number,
-    likes:number
+    likes:number,
+    createdAt:string
 }){
 
     const[likes,setLikes] = useState(props.likes);
@@ -96,7 +97,7 @@ export default function PostComment(props:{
         const headers = {
             "Authorization":token
         }
-        const response = await fetch(`http://localhost:8000/dislikepost/${props.id}`,{
+        const response = await fetch(`http://localhost:8000/dislikecomment/${props.id}`,{
             method:"POST",
             headers:headers
         })
@@ -134,10 +135,11 @@ export default function PostComment(props:{
         }
     }
     return(
-        <div className="comment">
+        <div id={props.id.toString()}  className="comment">
             <a href="#">{props.authorname}</a>
             <div className="comment-content">{props.content}</div>
-            <div className="comment-likes">{props.likes} likes</div>
+            <div className="comment-likes">{likes} likes</div>
+            <div>{props.createdAt}</div>
             <button className="like-button" onClick={()=>{
                 if(liked){
                     removeLike();

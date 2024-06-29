@@ -48,18 +48,19 @@ type PostComments_WithUserPreference struct {
 	Post               Posts
 	PostLikedByUser    bool
 	PostDislikedByUser bool
-	Comments           []UsernameAndComment
+	Comments           []Comment
 }
 type PostandComments struct {
 	Post     Posts
-	Comments []UsernameAndComment
+	Comments []Comment
 }
 type UsernameAndComment struct {
 	User_id         uint64
 	Username        string
-	CommentID       uint64
+	Comment_id      uint64
 	Comment_content string
 	Comment_likes   uint64
+	CreatedAt       string
 }
 type Passanduserid struct {
 	Password string `db:"password"`

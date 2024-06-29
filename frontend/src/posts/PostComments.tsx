@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Comment from "../types/Comment";
-import CommentBox from "./CommentBox";
 import PostComment from "./PostComment";
-import { LinkedList } from "../utils/LinkedList";
 
 export default function PostComments(props:{
     comments:Comment[] ,
     postid:number | undefined
 }){ 
 
-    const[list,setList] = useState<LinkedList<Comment>>();
+    const[commentsList,setCommentsList] = useState(props.comments)
     const[tokenFound,setTokenFound] = useState(false);
     const[token,setToken] = useState<string>();
     const[comment,setComment] = useState<string>();
@@ -22,14 +20,7 @@ export default function PostComments(props:{
             setToken(token);
             setTokenFound(true);
         }
-        let commentsList = new LinkedList<Comment>();
-
-        for(const comment of props.comments){
-            commentsList.push(comment);
-        }
-        console.log(commentsList);
-        setList(commentsList);
-    
+        
     },[])
     
     function vanishErrorMessage(){
@@ -59,22 +50,16 @@ export default function PostComments(props:{
         })
         if(response.ok){
             const res = await response.json();
+            console.log(res)
             let newComment = new Comment(
                res.Comment_id,
                res.User_id,
                res.Username,
                res.Comment_content,
-               res.Comment_likes 
+               res.Comment_likes,
+               res.CreatedAt 
             );
-            console.log(newComment)
-            if(list != undefined){
-                list.push_front(newComment);
-                setList(list);
-            }else{
-                let commentsList = new LinkedList<Comment>();
-                commentsList.push(newComment);
-                setList(commentsList);
-            }
+            setCommentsList([newComment,...commentsList])  
         }else if(response.status === 500){
             renderError("try again.");
         }else if(response.status === 401 || 400){
@@ -95,19 +80,17 @@ export default function PostComments(props:{
         <div>{displayError?error:""}</div>
         
         </div>
-           {props.comments ?
             <div className="comments-section">
-                <div className="comment-title">Comments: {props.comments.length}</div>
-                {props.comments.map((comment)=><PostComment 
+                <div className="comment-title">Comments: {commentsList.length}</div>
+                {commentsList.map((comment)=><PostComment 
                 id={comment.id}
                 content={comment.content}
                 authorid={comment.authorid}
                 authorname={comment.authorname}
                 likes={comment.likes}
+                createdAt={comment.createdAt}
                 />)} 
             </div>
-            :<></>    
-            } 
         </div>
     )
 }

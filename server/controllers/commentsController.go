@@ -198,94 +198,50 @@ func ParseToken(token string) (uint64, bool) {
 }
 
 func LikeComment(w http.ResponseWriter, r *http.Request) {
-	var tokenInvalid bool
-	var tokenExpired bool
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, _, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-	}()
-	<-a
+	tokenExpired, _, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenInvalid {
 		w.WriteHeader(400)
 		return
 	}
-
 	if tokenExpired {
 		w.WriteHeader(401)
 		return
 	}
-	var commentID uint64
-	var err error
-	b := make(chan int, 1)
-	go func() {
-		rbody, err := io.ReadAll(r.Body)
-		if err != nil {
-			b <- 1
-			return
-		}
-		json.Unmarshal(rbody, &commentID)
-		b <- 1
-	}()
-	<-b
+	var commentidstr string
+	var commentid uint64
+	vars := mux.Vars(r)
+	commentidstr = vars["id"]
+	commentid, err := strconv.ParseUint(commentidstr, 10, 64)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
 
-	c := make(chan int, 1)
-	go func() {
-		models.LikeAComment(commentID)
-		c <- 1
-	}()
-	<-c
+	models.LikeComment(commentid)
 
 	w.WriteHeader(200)
 }
-
 func DislikeComment(w http.ResponseWriter, r *http.Request) {
-	var tokenExpired bool
-	var tokenInvalid bool
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, _, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-	}()
-	<-a
-
+	tokenExpired, _, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenInvalid {
 		w.WriteHeader(400)
 		return
 	}
-
 	if tokenExpired {
 		w.WriteHeader(401)
 		return
 	}
-	var commentID uint64
-	var err error
-	b := make(chan int, 1)
-	go func() {
-		rbody, err := io.ReadAll(r.Body)
-		if err != nil {
-			b <- 1
-			return
-		}
-		json.Unmarshal(rbody, &commentID)
-		b <- 1
-	}()
-	<-b
+	var commentidstr string
+	var commentid uint64
+	vars := mux.Vars(r)
+	commentidstr = vars["id"]
+	commentid, err := strconv.ParseUint(commentidstr, 10, 64)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
 
-	c := make(chan int, 1)
-	go func() {
-		models.DislikeAComment(commentID)
-		c <- 1
-	}()
-	<-c
+	models.DislikeComment(commentid)
 
 	w.WriteHeader(200)
 }
