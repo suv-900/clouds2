@@ -112,61 +112,6 @@ func PostById(postid uint64) (Posts, error) {
 	return post, r.Error
 }
 
-// server should be dumb and do what said nothing extra
-// func LikePostByID(userid uint64, postid uint64) error {
-// 	var err error
-
-// 	c := make(chan int, 1)
-// 	go func() {
-// 		r := db.Exec("DELETE FROM posts_disliked_by_user WHERE user_id=? AND post_id=?", userid, postid)
-// 		if r.Error != nil {
-// 			err = r.Error
-// 			c <- 1
-// 			return
-// 		}
-// 		c <- 1
-// 	}()
-// 	<-c
-
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	a := make(chan int, 1)
-// 	go func() {
-// 		tx := db.Begin()
-// 		r := tx.Exec("UPDATE posts SET post_likes=post_likes+1 WHERE post_id=?", postid)
-// 		if r.Error != nil {
-// 			err = r.Error
-// 			a <- 1
-// 			tx.Rollback()
-// 			return
-// 		}
-// 		tx.Commit()
-// 		a <- 1
-// 	}()
-// 	<-a
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	b := make(chan int, 1)
-// 	go func() {
-// 		tx := db.Begin()
-// 		r := tx.Exec("INSERT INTO posts_liked_by_user (user_id,post_id,liked) VALUES(?,?,?)", userid, postid, true)
-// 		if r.Error != nil {
-// 			err = r.Error
-// 			b <- 1
-// 			tx.Rollback()
-// 			return
-// 		}
-// 		tx.Commit()
-// 		b <- 1
-// 	}()
-// 	<-b
-// 	return err
-// }
-
 func LikePost(postid uint64, userid uint64) error {
 	tx := db.Begin()
 	r := tx.Exec("INSERT INTO posts_liked_by_users(user_id,post_id) VALUES(?,?) ", userid, postid)

@@ -5,13 +5,18 @@ export default class Comment{
     content:string;
     likes:number;
     createdAt:string; 
+    userLiked:boolean;
+    userDisliked:boolean
+
     constructor(
         id:number,
         authorid:number,
         authorname:string,
         content:string,
         likes:number,
-        createdAt:string
+        createdAt:string,
+        userLiked:boolean,
+        userDisliked:boolean
     ){
         this.id = id;
         this.authorid = authorid;
@@ -19,5 +24,7 @@ export default class Comment{
         this.content = content;
         this.likes = likes;
         this.createdAt = createdAt;
+        this.userLiked = userLiked;
+        this.userDisliked = userDisliked;
     }
 }

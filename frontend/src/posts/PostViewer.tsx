@@ -63,7 +63,9 @@ export default function PostViewer(){
                         b.Username,
                         b.Comment_content,
                         b.Comment_likes,
-                        b.CreatedAt
+                        b.CreatedAt,
+                        b.Liked,
+                        b.Disliked
                     )
                     commentsarr.push(comment);
                 }
@@ -105,7 +107,9 @@ export default function PostViewer(){
                         b.Username,
                         b.Comment_content,
                         b.Comment_likes,
-                        b.CreatedAt
+                        b.CreatedAt,
+                        false,
+                        false
                     )
                     commentsarr.push(comment);
                 }

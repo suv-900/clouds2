@@ -229,7 +229,6 @@ func GetPostByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	comments := models.GetAllCommentsByPostID(postid)
-
 	finalRes := models.PostandComments{Post: post, Comments: comments}
 	parsedRes, err := json.Marshal(finalRes)
 	if err != nil {
@@ -276,7 +275,7 @@ func GetPostByID_WithUserPreferences(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	comments := models.GetAllCommentsByPostID(postid)
+	comments := models.GetUserCommentReaction(postid, userid)
 	// if err != nil {
 	// 	serverError(&w, err)
 	// 	return

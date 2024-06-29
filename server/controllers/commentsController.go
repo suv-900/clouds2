@@ -198,7 +198,7 @@ func ParseToken(token string) (uint64, bool) {
 }
 
 func LikeComment(w http.ResponseWriter, r *http.Request) {
-	tokenExpired, _, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenInvalid {
 		w.WriteHeader(400)
 		return
@@ -217,12 +217,15 @@ func LikeComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	models.LikeComment(commentid)
-
+	err = models.LikeComment(commentid, userid)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
 	w.WriteHeader(200)
 }
 func DislikeComment(w http.ResponseWriter, r *http.Request) {
-	tokenExpired, _, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenInvalid {
 		w.WriteHeader(400)
 		return
@@ -241,7 +244,65 @@ func DislikeComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	models.DislikeComment(commentid)
+	err = models.DislikeComment(commentid, userid)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	w.WriteHeader(200)
+}
+func RemoveLikeFromComment(w http.ResponseWriter, r *http.Request) {
+	var commentid uint64
+	var err error
 
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	if tokenExpired {
+		w.WriteHeader(401)
+	}
+	if tokenInvalid {
+		w.WriteHeader(400)
+		return
+	}
+	vars := mux.Vars(r)
+	commentidstr := vars["id"]
+	commentid, err = strconv.ParseUint(commentidstr, 10, 64)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	err = models.RemoveLikeFromComment(commentid, userid)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	w.WriteHeader(200)
+}
+
+func RemoveDislikeFromComment(w http.ResponseWriter, r *http.Request) {
+	var commentid uint64
+	var err error
+
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	if tokenExpired {
+		w.WriteHeader(401)
+	}
+	if tokenInvalid {
+		w.WriteHeader(400)
+		return
+	}
+	vars := mux.Vars(r)
+	commentidstr := vars["id"]
+	commentid, err = strconv.ParseUint(commentidstr, 10, 64)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	err = models.RemoveLikeFromComment(commentid, userid)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
 	w.WriteHeader(200)
 }

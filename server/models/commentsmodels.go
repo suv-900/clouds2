@@ -1,12 +1,147 @@
 package models
 
-// call responsively
-func LikeComment(commentid uint64) {
-	db.Exec("UPDATE comments SET comment_likes=comment_likes+1 WHERE comment_id=?", commentid)
+func LikeComment(commentid uint64, userid uint64) error {
+	tx := db.Begin()
+	r := tx.Exec("INSERT INTO comments_liked_by_users(user_id,comment_id) VALUES(?,?) ", userid, commentid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+
+	tx = db.Begin()
+	r = tx.Exec("UPDATE comments SET comment_likes = comment_likes + 1 WHERE comment_id=?", commentid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+	return nil
 }
 
-func DislikeComment(commentid uint64) {
-	db.Exec("UPDATE comments SET comment_likes=comment_likes-1 WHERE comment_id=?", commentid)
+func DislikeComment(commentid uint64, userid uint64) error {
+	tx := db.Begin()
+	r := tx.Exec("INSERT INTO comments_disliked_by_users(user_id,comment_id) VALUES(?,?) ", userid, commentid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+
+	tx = db.Begin()
+	r = tx.Exec("UPDATE comments SET comment_likes = comment_likes - 1 WHERE comment_id=?", commentid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+	return nil
+}
+func RemoveLikeFromComment(commentid uint64, userid uint64) error {
+	tx := db.Begin()
+	r := tx.Exec("DELETE FROM comments_liked_by_users WHERE user_id=? AND comment_id=?", userid, commentid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+
+	tx = db.Begin()
+	r = tx.Exec("UPDATE comments SET comment_likes=comment_likes - 1 WHERE comment_id=?", commentid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+	return nil
+}
+
+func RemoveDislikeFromComment(commentid uint64, userid uint64) error {
+	tx := db.Begin()
+	r := tx.Exec("DELETE FROM comments_disliked_by_users WHERE user_id=? AND comment_id=?", userid, commentid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+
+	tx = db.Begin()
+	r = tx.Exec("UPDATE comments SET comment_likes=comment_likes + 1 WHERE comment_id=?", commentid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+	}
+	return nil
+}
+
+// SELECT
+//     c.commentid,
+//     c.userid AS commenter_id,
+//     c.postid,
+//     c.comment_text,
+//     CASE
+//         WHEN l.likeid IS NOT NULL THEN 'Yes'
+//         ELSE 'No'
+//     END AS user_liked,
+//     CASE
+//         WHEN d.dislikeid IS NOT NULL THEN 'Yes'
+//         ELSE 'No'
+//     END AS user_disliked
+// FROM
+//     comments c
+// LEFT JOIN
+//     likes l
+// ON
+//     c.commentid = l.commentid
+//     AND l.userid = :userid
+// LEFT JOIN
+//     dislikes d
+// ON
+//     c.commentid = d.commentid
+//     AND d.userid = :userid
+// WHERE
+//     c.postid = :postid
+// ORDER BY
+//     c.commentid;
+
+func GetUserCommentReaction(postid uint64, userid uint64) []CommentsWithReactions {
+	var comments []CommentsWithReactions
+	sql := `SELECT c.*, 
+		CASE 
+			WHEN l.like_id IS NOT NULL THEN true
+			ELSE false
+		END AS user_liked,
+		CASE 
+			WHEN d.dislike_id IS NOT NULL THEN true
+			ELSE false
+		END AS user_disliked
+		FROM
+			comments c
+		LEFT JOIN
+			comments_liked_by_users l
+		ON 
+			c.comment_id = l.comment_id AND l.user_id = ?
+		LEFT JOIN
+			comments_disliked_by_users d 
+		ON 
+			c.comment_id = d.comment_id AND d.user_id = ?
+		WHERE
+			c.post_id = ?
+		ORDER BY
+			c.comment_likes
+		DESC LIMIT 5
+		`
+	db.Raw(sql, userid, userid, postid).Scan(&comments)
+	return comments
 }
 
 func Get5CommentsByPostID(postid uint64) ([]UsernameAndComment, error) {

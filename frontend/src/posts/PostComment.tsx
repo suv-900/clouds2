@@ -7,12 +7,14 @@ export default function PostComment(props:{
     authorname:string,
     authorid:number,
     likes:number,
-    createdAt:string
+    createdAt:string,
+    userLiked:boolean,
+    userDisliked:boolean
 }){
 
     const[likes,setLikes] = useState(props.likes);
-    const[liked,setLiked] = useState(false);    
-    const[disliked,setDisliked] = useState(false);    
+    const[liked,setLiked] = useState(props.userLiked);    
+    const[disliked,setDisliked] = useState(props.userDisliked);    
     const[token,setToken] = useState<string>();
     const[displayError,setDisplayError] = useState(false);
     

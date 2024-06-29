@@ -57,7 +57,9 @@ export default function PostComments(props:{
                res.Username,
                res.Comment_content,
                res.Comment_likes,
-               res.CreatedAt 
+               res.CreatedAt,
+               false,
+               false 
             );
             setCommentsList([newComment,...commentsList])  
         }else if(response.status === 500){
@@ -89,6 +91,8 @@ export default function PostComments(props:{
                 authorname={comment.authorname}
                 likes={comment.likes}
                 createdAt={comment.createdAt}
+                userLiked={comment.userLiked}
+                userDisliked={comment.userDisliked}
                 />)} 
             </div>
         </div>

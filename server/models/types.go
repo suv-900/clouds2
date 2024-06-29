@@ -35,6 +35,20 @@ type Comment struct {
 	UpdatedAt       time.Time `db:"updatedat"`
 }
 
+type CommentsWithReactions struct {
+	Comment_id      uint64    `db:"comment_id"`
+	Post_id         uint64    `db:"post_id"`
+	User_id         uint64    `db:"user_id"`
+	Username        string    `db:"username"`
+	Comment_content string    `db:"comment_content"`
+	Comment_likes   uint64    `db:"comment_likes"`
+	CreatedAt       time.Time `db:"createdat"`
+	UpdatedAt       time.Time `db:"updatedat"`
+
+	Liked    bool `db:"user_liked"`
+	Disliked bool `db:"user_disliked"`
+}
+
 type UserAndPost struct {
 	User  Users
 	Posts []Posts
@@ -48,7 +62,7 @@ type PostComments_WithUserPreference struct {
 	Post               Posts
 	PostLikedByUser    bool
 	PostDislikedByUser bool
-	Comments           []Comment
+	Comments           []CommentsWithReactions
 }
 type PostandComments struct {
 	Post     Posts
