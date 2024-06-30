@@ -1,28 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Comment from "../types/Comment";
 import PostComment from "./PostComment";
 
 export default function PostComments(props:{
+    token:string | null,
     comments:Comment[] ,
     postid:number | undefined
 }){ 
 
     const[commentsList,setCommentsList] = useState(props.comments)
-    const[tokenFound,setTokenFound] = useState(false);
-    const[token,setToken] = useState<string>();
     const[comment,setComment] = useState<string>();
     const[displayError,setDisplayError] = useState(false);
     const[error,setError] = useState("");
    
-    useEffect(()=>{
-        const token = localStorage.getItem("token");
-        if(token !== null){
-            setToken(token);
-            setTokenFound(true);
-        }
-        
-    },[])
-    
     function vanishErrorMessage(){
         setTimeout(()=>{
             setDisplayError(false);
@@ -35,12 +25,16 @@ export default function PostComments(props:{
         vanishErrorMessage();
     }
     async function addComment(){
-        if(comment === undefined || comment.length === 0 || token === undefined){
+        if(props.token === null){
+            renderError("please login.")
+            return;
+        }
+        if(comment === undefined || comment.length === 0 ){
             renderError("invalid.");
             return;
         }
         const headers={
-            "Authorization":token
+            "Authorization":props.token
         }
         const body = JSON.stringify(comment);
         const response = await fetch(`http://localhost:8000/addcomment/${props.postid}`,{
@@ -73,7 +67,7 @@ export default function PostComments(props:{
     return(
         <div >
             <div>
-            {tokenFound && props.postid?
+            {props.token && props.postid?
         <div>
             <label>add comment</label>
             <input type="text" onChange={(e)=>{setComment(e.target.value)}}/>

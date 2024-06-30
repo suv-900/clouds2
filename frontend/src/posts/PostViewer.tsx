@@ -1,33 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Post  from "../types/Post";
 import Comment from "../types/Comment";
 import Loading from "../components/Loading";
 import PostComponent from "./PostComponent";
+import { useNavigate } from "react-router-dom";
 
 export default function PostViewer(){
-    const[tokenFound,setTokenFound] = useState(false);
+    const[token,setToken] = useState<string | null>("")
     const[loading,setLoading] = useState(true);
     const[clientError,setClientError] = useState(false);
     const[post,setPost] = useState<Post>()
     const[comments,setComments] = useState<Comment[]>([]);
+    
+    const navigator = useCallback(useNavigate(),[])
     
     useEffect(()=>{
         const queryparams = new URLSearchParams(window.location.search);
         const i = queryparams.get("id"); 
         
         if(i === null){
-            setClientError(true);
+            navigator("/error");
         }else{
+            const token = localStorage.getItem("token");
+            setToken(token)
             const id = parseInt(i); 
             getPost(id);
         } 
     },[])
 
     async function getPost(postid:number ){
-        
-        const token = localStorage.getItem("token");
-
-        if(token !== null){
+        if(token != null){
             const requestHeaders = {
                 "Authorization":token
             }
@@ -133,9 +135,9 @@ export default function PostViewer(){
             <Loading enable={loading} />
             {!loading?
             <PostComponent 
-            comments={comments}
             post={post}
-            tokenFound={tokenFound}
+            comments={comments}
+            token={token}
             />
             :<></>}
         </div>

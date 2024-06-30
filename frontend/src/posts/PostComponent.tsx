@@ -2,25 +2,23 @@ import React from "react";
 import Post from "../types/Post";
 import TopHeader from "../components/TopHeader";
 import PostContent from "./PostContent";
-import CommentBox from "./CommentBox";
 import PostComments from "./PostComments";
 import Comment from "../types/Comment";
-
 
 export default function PostComponent(props:{
     post:Post | undefined,
     comments:Comment[],
-    tokenFound:boolean,
+    token:string | null,
 }){
-    console.log("post component");
     return(
         <div>
             <TopHeader/>
             <PostContent 
-                tokenFound={props.tokenFound} 
+                token={props.token} 
                 postContent={props.post}               
             />
-            <PostComments 
+            <PostComments
+                token={props.token} 
                 comments={props.comments}
                 postid={props.post?props.post.id:undefined}
             />

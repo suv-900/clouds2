@@ -4,7 +4,7 @@ import CustomError from "../components/CustomError";
 
 //need 1 more work
 export default function PostFooter(props:{
-    tokenFound:boolean,
+    token:string | null,
     likes:number,
     postLiked:boolean,
     postDisliked:boolean,
@@ -15,19 +15,8 @@ export default function PostFooter(props:{
     const[likes,setLikes] = useState(props.likes);
     const[liked,setLiked] = useState(props.postLiked);    
     const[disliked,setDisliked] = useState(props.postDisliked);   
-    const[tokenFound,setTokenFound] = useState(false);
     const[token,setToken] = useState<string>();
     
-    useEffect(()=>{
-        const token = localStorage.getItem("token");
-        if(token !== null){
-            setToken(token);
-            setTokenFound(true);
-        }
-    },[])
-    
-
-
     function vanishErrorMessage(){
         setTimeout(()=>{
             setDisplayError(false);
@@ -40,7 +29,7 @@ export default function PostFooter(props:{
     }
 
     async function likePost(){
-        if(!tokenFound || token === undefined){
+        if(token == null){
             renderErrorMessage();
             return;
         }
@@ -66,7 +55,7 @@ export default function PostFooter(props:{
         }
     }
     async function removeLike(){
-        if(!tokenFound || token === undefined){
+        if(token == null){
             renderErrorMessage();
             return;
         }
@@ -90,9 +79,8 @@ export default function PostFooter(props:{
     }
     
     async function dislikePost(){
-        if(!tokenFound || token === undefined){
-            setDisplayError(true);
-            vanishErrorMessage();
+        if(token == null){
+            renderErrorMessage();
             return;
         }
 
@@ -118,9 +106,8 @@ export default function PostFooter(props:{
         }
     }
     async function removeDislike(){
-        if(!tokenFound || token === undefined){
-            setDisplayError(true);
-            vanishErrorMessage();
+        if(token == null){
+            renderErrorMessage();
             return;
         }
 

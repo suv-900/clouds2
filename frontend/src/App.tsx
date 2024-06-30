@@ -5,6 +5,7 @@ import Login from './components/user/Login';
 import Register from './components/user/Register';
 import Home from './components/Home';
 import CreatePost from './posts/CreatePost';
+import ErrorPage from './components/ErrorPage';
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
   {
     path:"/createpost",
     element:<CreatePost/>
+  },
+  {
+    path:"/error",
+    element:<ErrorPage/>
   }
 ])
 

@@ -6,7 +6,7 @@ import CustomError from "../components/CustomError";
 import PostFooter from "./PostFooter";
 
 export default function PostContent(props:{
-    tokenFound:boolean,
+    token:string | null,
     postContent:Post | undefined,
 }){
     const post = props.postContent;  
@@ -22,7 +22,7 @@ export default function PostContent(props:{
                 </div>
                 <p className="post-content">{post.content}</p>
                 <div className="post-footer">
-                   <PostFooter tokenFound={props.tokenFound} 
+                   <PostFooter token={props.token} 
                    postid={post.id} 
                    likes={post.likes} 
                    postLiked={post.postLiked}
