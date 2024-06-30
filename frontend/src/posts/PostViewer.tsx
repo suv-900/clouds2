@@ -6,7 +6,7 @@ import PostComponent from "./PostComponent";
 import { useNavigate } from "react-router-dom";
 
 export default function PostViewer(){
-    const[token,setToken] = useState<string | null>("")
+    const[token,setToken] = useState<string | null>(null)
     const[loading,setLoading] = useState(true);
     const[clientError,setClientError] = useState(false);
     const[post,setPost] = useState<Post>()
@@ -22,6 +22,7 @@ export default function PostViewer(){
             navigator("/error");
         }else{
             const token = localStorage.getItem("token");
+            console.log("token"+token)
             setToken(token)
             const id = parseInt(i); 
             getPost(id);
@@ -29,7 +30,8 @@ export default function PostViewer(){
     },[])
 
     async function getPost(postid:number ){
-        if(token != null){
+        console.log(token)
+        if(token !== null){
             const requestHeaders = {
                 "Authorization":token
             }
@@ -72,10 +74,12 @@ export default function PostViewer(){
                     commentsarr.push(comment);
                 }
                 setComments(commentsarr);
-            }else if(response.status === 401){
-                //component to delay and take back to login
+            }else if(response.status === 401 || 400){
+               setTimeout(()=>{
+                navigator("/login")
+               },3000) 
             }else if(response.status === 500){
-                // server error componenet
+                navigator("/server_error")
             }else{
 
             }
@@ -134,7 +138,7 @@ export default function PostViewer(){
         <div>
             <Loading enable={loading} />
             {!loading?
-            <PostComponent 
+            <PostComponent
             post={post}
             comments={comments}
             token={token}
