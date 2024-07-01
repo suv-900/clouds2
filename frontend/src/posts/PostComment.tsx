@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CustomError from "../components/CustomError";
+import { AuthContext } from "./PostViewer";
 
 export default function PostComment(props:{
     id:number,
@@ -12,21 +13,14 @@ export default function PostComment(props:{
     userDisliked:boolean
 }){
 
+    const token = useContext(AuthContext)
+
     const[likes,setLikes] = useState(props.likes);
     const[liked,setLiked] = useState(props.userLiked);    
     const[disliked,setDisliked] = useState(props.userDisliked);    
-    const[token,setToken] = useState<string>();
     const[displayError,setDisplayError] = useState(false);
     
-    useEffect(()=>{
-        const token = localStorage.getItem("token");
-        if(token){
-            setToken(token);
-        }
-    },[])
-    
-
-
+   
     function vanishErrorMessage(){
         setTimeout(()=>{
             setDisplayError(false);
@@ -39,7 +33,7 @@ export default function PostComment(props:{
     }
 
     async function likeComment(){
-        if(token === undefined){
+        if(token.length === 0){
             renderErrorMessage();
             return;
         }
@@ -62,7 +56,7 @@ export default function PostComment(props:{
         }
     }
     async function removeLike(){
-        if(token === undefined){
+        if(token.length === 0){
             renderErrorMessage();
             return;
         }
@@ -86,9 +80,8 @@ export default function PostComment(props:{
     }
     
     async function dislikeComment(){
-        if(token === undefined){
-            setDisplayError(true);
-            vanishErrorMessage();
+        if(token.length === 0){
+            renderErrorMessage();
             return;
         }
 
@@ -114,9 +107,8 @@ export default function PostComment(props:{
         }
     }
     async function removeDislike(){
-        if(token === undefined){
-            setDisplayError(true);
-            vanishErrorMessage();
+        if(token.length === 0){
+            renderErrorMessage();
             return;
         }
 

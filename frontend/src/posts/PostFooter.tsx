@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CustomError from "../components/CustomError";
+import { AuthContext } from "./PostViewer";
 
 
 //need 1 more work
 export default function PostFooter(props:{
-    token:string | null,
     likes:number,
     postLiked:boolean,
     postDisliked:boolean,
     postid:number
 }){
-     
+    
+    const token = useContext(AuthContext)
+    
     const[displayError,setDisplayError] = useState(false);
     const[likes,setLikes] = useState(props.likes);
     const[liked,setLiked] = useState(props.postLiked);    
     const[disliked,setDisliked] = useState(props.postDisliked);   
-    const[token,setToken] = useState<string>();
     
     function vanishErrorMessage(){
         setTimeout(()=>{
@@ -29,7 +30,7 @@ export default function PostFooter(props:{
     }
 
     async function likePost(){
-        if(token == null){
+        if(token.length === 0){
             renderErrorMessage();
             return;
         }
@@ -55,7 +56,7 @@ export default function PostFooter(props:{
         }
     }
     async function removeLike(){
-        if(token == null){
+        if(token.length === 0){
             renderErrorMessage();
             return;
         }
@@ -79,7 +80,7 @@ export default function PostFooter(props:{
     }
     
     async function dislikePost(){
-        if(token == null){
+        if(token.length === 0){
             renderErrorMessage();
             return;
         }
@@ -106,7 +107,7 @@ export default function PostFooter(props:{
         }
     }
     async function removeDislike(){
-        if(token == null){
+        if(token.length === 0){
             renderErrorMessage();
             return;
         }

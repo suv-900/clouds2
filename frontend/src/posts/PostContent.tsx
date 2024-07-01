@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Post from "../types/Post";
 import "../css/styles.css";
-import { useNavigate } from "react-router-dom";
-import CustomError from "../components/CustomError";
 import PostFooter from "./PostFooter";
 
 export default function PostContent(props:{
-    token:string | null,
-    postContent:Post | undefined,
+    post:Post,
 }){
-    const post = props.postContent;  
+    const {post} = props
     return(
         <div>
-            {post ?
-            <div>
             <div className="post">
                 <img src={process.env.PUBLIC_URL+'/retrobuttons/book.gif'} alt="image not found"/>  
                 <div className="post-header">
@@ -22,7 +17,7 @@ export default function PostContent(props:{
                 </div>
                 <p className="post-content">{post.content}</p>
                 <div className="post-footer">
-                   <PostFooter token={props.token} 
+                   <PostFooter  
                    postid={post.id} 
                    likes={post.likes} 
                    postLiked={post.postLiked}
@@ -37,8 +32,7 @@ export default function PostContent(props:{
                 <img src={process.env.PUBLIC_URL+'/retrobuttons/iexplorer.gif'} alt="image not found" />  
                 <img src={process.env.PUBLIC_URL+'/retrobuttons/win95.gif'} alt="image not found" />  
             </div>
-            </div>
-            :<></>}
+            
         </div>
     )
 }

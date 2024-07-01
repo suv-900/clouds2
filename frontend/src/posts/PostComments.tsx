@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Comment from "../types/Comment";
 import PostComment from "./PostComment";
+import { AuthContext } from "./PostViewer";
 
 export default function PostComments(props:{
-    token:string | null,
     comments:Comment[] ,
-    postid:number | undefined
+    postid:number 
 }){ 
+
+    const token = useContext(AuthContext)
 
     const[commentsList,setCommentsList] = useState(props.comments)
     const[comment,setComment] = useState<string>();
@@ -25,7 +27,7 @@ export default function PostComments(props:{
         vanishErrorMessage();
     }
     async function addComment(){
-        if(props.token === null){
+        if(token.length === 0){
             renderError("please login.")
             return;
         }
@@ -34,7 +36,7 @@ export default function PostComments(props:{
             return;
         }
         const headers={
-            "Authorization":props.token
+            "Authorization":token
         }
         const body = JSON.stringify(comment);
         const response = await fetch(`http://localhost:8000/addcomment/${props.postid}`,{
@@ -67,7 +69,7 @@ export default function PostComments(props:{
     return(
         <div >
             <div>
-            {props.token && props.postid?
+            {token.length !== 0 && props.postid?
         <div>
             <label>add comment</label>
             <input type="text" onChange={(e)=>{setComment(e.target.value)}}/>

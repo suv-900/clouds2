@@ -1,19 +1,25 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import Post  from "../types/Post";
 import Comment from "../types/Comment";
 import Loading from "../components/Loading";
-import PostComponent from "./PostComponent";
 import { useNavigate } from "react-router-dom";
+import TopHeader from "../components/TopHeader";
+import PostComments from "./PostComments";
+import PostContent from "./PostContent";
+import NotFound from "../components/errors/NotFound";
 
-export default function PostViewer(){
-    const[token,setToken] = useState<string | null>(null)
+const AuthContext = createContext("");
+
+function PostViewer(){
+    const token = localStorage.getItem("token")
+    
     const[loading,setLoading] = useState(true);
     const[clientError,setClientError] = useState(false);
     const[post,setPost] = useState<Post>()
     const[comments,setComments] = useState<Comment[]>([]);
     
     const navigator = useCallback(useNavigate(),[])
-    
+
     useEffect(()=>{
         const queryparams = new URLSearchParams(window.location.search);
         const i = queryparams.get("id"); 
@@ -21,9 +27,7 @@ export default function PostViewer(){
         if(i === null){
             navigator("/error");
         }else{
-            const token = localStorage.getItem("token");
             console.log("token"+token)
-            setToken(token)
             const id = parseInt(i); 
             getPost(id);
         } 
@@ -135,15 +139,30 @@ export default function PostViewer(){
     }
 
     return(
+        <AuthContext.Provider value={token !== null?token:""}>
+
         <div>
             <Loading enable={loading} />
-            {!loading?
-            <PostComponent
-            post={post}
-            comments={comments}
-            token={token}
-            />
+            {!loading && post !== undefined?
+            <div>
+                <TopHeader/>
+                <PostContent 
+                    post={post}               
+                />
+                <PostComments
+                    comments={comments}
+                    postid={post.id}
+                />
+
+            </div>
             :<></>}
+            {!loading && post === undefined?
+                <NotFound/>
+            :<></>
+            }
         </div>
+        </AuthContext.Provider>
     )
 }
+
+export {PostViewer,AuthContext}
