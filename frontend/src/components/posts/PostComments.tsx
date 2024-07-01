@@ -45,19 +45,22 @@ export default function PostComments(props:{
             body:body,
         })
         if(response.ok){
+            const curr = new Date();
+            const timeStamp = curr.getHours()+":"+curr.getMinutes()+(curr.getHours() >= 12? ' pm':' am');
+            
             const res = await response.json();
-            console.log(res)
             let newComment = new Comment(
                res.Comment_id,
                res.User_id,
                res.Username,
                res.Comment_content,
                res.Comment_likes,
-               res.CreatedAt,
+               timeStamp,
                false,
-               false 
+               false,
+               true
             );
-            setCommentsList([newComment,...commentsList])  
+            setCommentsList([newComment,...commentsList]) 
         }else if(response.status === 500){
             renderError("try again.");
         }else if(response.status === 401 || 400){
@@ -70,26 +73,27 @@ export default function PostComments(props:{
         <div >
             <div>
             {token.length !== 0 && props.postid?
-        <div>
-            <label>add comment</label>
-            <input type="text" onChange={(e)=>{setComment(e.target.value)}}/>
-            <button onClick={()=>{addComment()}}>submit</button>
-        </div>:<></>}
+        
+        <div className="comment-box">
+            <label>Add comment:</label><br></br>
+            <textarea
+            placeholder="write a comment..."
+                onChange={
+                    (e)=>{
+                        setComment(e.target.value)
+                }}
+                /><br></br>
+            <div className="cmb-buttondiv">
+            <button className="post-like-button"onClick={()=>{addComment()}}>submit</button>
+            </div>
+        </div>
+        :<></>}
         <div>{displayError?error:""}</div>
         
         </div>
             <div className="comments-section">
                 <div className="comment-title">Comments: {commentsList.length}</div>
-                {commentsList.map((comment)=><PostComment 
-                id={comment.id}
-                content={comment.content}
-                authorid={comment.authorid}
-                authorname={comment.authorname}
-                likes={comment.likes}
-                createdAt={comment.createdAt}
-                userLiked={comment.userLiked}
-                userDisliked={comment.userDisliked}
-                />)} 
+                {commentsList.map((comment)=><PostComment comment={comment}/>)}
             </div>
         </div>
     )

@@ -131,20 +131,26 @@ export default function PostFooter(props:{
     return(
         <div>
             <div className="post-likes">{likes} likes</div>
-            <button className="like-button" onClick={()=>{
+
+            <div className="div-plb">
+            <button className="post-like-button" onClick={()=>{
                 if(liked){
                     removeLike();
                 }else{
                     likePost();
                 }
                 }}>{liked?"liked":"like"}</button>
-            <button className="like-button" onClick={()=>{
+
+            </div>
+            <div className="div-plb">
+            <button className="post-dislike-button" onClick={()=>{
                 if(disliked){
                     removeDislike();
                 }else{
                     dislikePost();
                 }
                 }}>{disliked?"disliked":"dislike"}</button>
+            </div>
 
             <CustomError enable={displayError} message={"please login"} />
 

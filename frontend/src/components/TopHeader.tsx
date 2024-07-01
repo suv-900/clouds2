@@ -16,12 +16,12 @@ export default function TopHeader(props:{
                     <span style={orange}>The</span>
                     <span style={green}>Internet!</span>
                 </div>
-                <div className="top-links">
-                    <a href="http://localhost:3000/login">Login</a>
-                    <a href="http://localhost:3000/register">Register</a>
-                </div>
+                
             </div>
-            :<></>
+            <div className="top-links">
+                    <a className="login-link" href="http://localhost:3000/login">Login</a>
+                    <a className="register-link" href="http://localhost:3000/register">Register</a>
+                </div>  
         </div>
     )
 }

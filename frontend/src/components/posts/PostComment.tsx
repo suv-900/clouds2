@@ -1,23 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
 import CustomError from "../errors/CustomError";
 import { AuthContext } from "./PostViewer";
+import Comment from "../../types/Comment";
+import CommentTimeStamp from "./NewlyAddedCommentTimeStamp";
+import NewlyAddedCommentTimeStamp from "./NewlyAddedCommentTimeStamp";
 
 export default function PostComment(props:{
-    id:number,
-    content:string,
-    authorname:string,
-    authorid:number,
-    likes:number,
-    createdAt:string,
-    userLiked:boolean,
-    userDisliked:boolean
+   comment:Comment 
 }){
 
+    const{comment} = props
     const token = useContext(AuthContext)
 
-    const[likes,setLikes] = useState(props.likes);
-    const[liked,setLiked] = useState(props.userLiked);    
-    const[disliked,setDisliked] = useState(props.userDisliked);    
+    const[likes,setLikes] = useState(comment.likes);
+    const[liked,setLiked] = useState(comment.userLiked);    
+    const[disliked,setDisliked] = useState(comment.userDisliked);    
     const[displayError,setDisplayError] = useState(false);
     
    
@@ -41,7 +38,7 @@ export default function PostComment(props:{
         const headers = {
             "Authorization":token
         }
-        const response = await fetch(`http://localhost:8000/likecomment/${props.id}`,{
+        const response = await fetch(`http://localhost:8000/likecomment/${comment.id}`,{
             method:"POST",
             headers:headers
         })
@@ -64,7 +61,7 @@ export default function PostComment(props:{
         const headers = {
             "Authorization":token
         }
-        const response = await fetch(`http://localhost:8000/removecommentlike/${props.id}`,{
+        const response = await fetch(`http://localhost:8000/removecommentlike/${comment.id}`,{
             method:"POST",
             headers:headers
         })
@@ -92,7 +89,7 @@ export default function PostComment(props:{
         const headers = {
             "Authorization":token
         }
-        const response = await fetch(`http://localhost:8000/dislikecomment/${props.id}`,{
+        const response = await fetch(`http://localhost:8000/dislikecomment/${comment.id}`,{
             method:"POST",
             headers:headers
         })
@@ -115,7 +112,7 @@ export default function PostComment(props:{
         const headers = {
             "Authorization":token
         }
-        const response = await fetch(`http://localhost:8000/removedislike/${props.id}`,{
+        const response = await fetch(`http://localhost:8000/removedislike/${comment.id}`,{
             method:"POST",
             headers:headers
         })
@@ -129,19 +126,26 @@ export default function PostComment(props:{
         }
     }
     return(
-        <div id={props.id.toString()}  className="comment">
-            <a href="#">{props.authorname}</a>
-            <div className="comment-content">{props.content}</div>
+        <div id={comment.id.toString()}  className="comment">
+            <a href={`http://localhost:3000/users/${comment.authorname}`} className="comment-authorname">{comment.authorname}</a>
+            
+            {comment.newlyAddedComment?<NewlyAddedCommentTimeStamp 
+            newlyAddedComment={comment.newlyAddedComment}
+            timeStamp={comment.createdAt}
+            />:
+            <div className="comment-createdat">{comment.createdAt}</div>
+            }
+            
+            <div className="comment-content">{comment.content}</div>
             <div className="comment-likes">{likes} likes</div>
-            <div>{props.createdAt}</div>
-            <button className="like-button" onClick={()=>{
+            <button className="comment-like-button" onClick={()=>{
                 if(liked){
                     removeLike();
                 }else{
                     likeComment();
                 }
                 }}>{liked?"liked":"like"}</button>
-            <button className="like-button" onClick={()=>{
+            <button className="comment-dislike-button" onClick={()=>{
                 if(disliked){
                     removeDislike();
                 }else{

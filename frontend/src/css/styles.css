@@ -1,16 +1,37 @@
 /* Body styles */
 
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4; /* Light grey background */
+    font-family: 'sans-serif';
+    font-weight:600;
     margin: 0;
     padding: 0;
+    background-color: #242323;
+    color: #e0e0e0;
     display: flex;
     justify-content: center;
-    align-items: center;
     overflow:auto;
 }
+.header-text {
+    font-size: 2em; /* Adjust as needed */
+    margin-top:12px;
+    margin-bottom:12px;
+    letter-spacing: 3px; /* Adjust spacing between letters */
+    word-spacing: 5px; /* Adjust spacing between words */
+    text-align: center; /* Center align the text */
+}
 
+[class*=classic]:before {
+  content:"Loading...";
+}
+.classic-2 {
+  font-weight: bold;
+  font-family: sans-serif;
+  font-size: 30px;
+  padding-bottom: 8px;
+  background:linear-gradient(currentColor 0 0) 0 100%/0% 3px no-repeat;
+  animation:c2 2s linear infinite;
+}
+@keyframes c2 {to{background-size: 100% 3px}}
 /* Container for the post creation form */
 .form-container {
     width: 100%;
@@ -67,15 +88,6 @@ body {
     margin-bottom: 5px;
 }
 
-/* General styles for the homepage */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 20px;
-}
-
-/* Container for each post */
 .post-container {
     width:600px;
     background-color: #fff;
@@ -247,109 +259,118 @@ body {
     max-width: 600px;
     text-align: left;
     margin: 20px auto;
-    background-color: #fff;
-    border: 2px solid #6a6a6a;
+    color: #e0e0e0;
+    background-color: #181818;
     padding: 20px;
 }
-
 .post-header {
-    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
 }
 
-/* Title of the post */
 .post-title {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #383838;
-    text-decoration: solid;
-    margin-bottom: 10px;
+    font-size: 2.5em;
+    margin: 0;
+    color: #e0e0e0;
 }
-
-/* Username of the person who posted */
 .post-username {
     font-size: 1.2em;
-    color: #777;
+    color: #e0e0e0;
     text-transform: uppercase;
     letter-spacing: 2px;
     display: block;
     margin-bottom: 10px;
 }
 
-/* Content section of the post */
 .post-content {
+    font-weight:500;
     line-height: 1.6;
-    margin-bottom: 20px;
+    font-size: 1.2em;
 }
 
-.post-footer .comment {
-    font-size: 0.9em; /* Slightly smaller font size */
-    color: #777;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Likes count */
-.post-likes .comment-likes {
+.post-likes {
+    color: #e0e0e0;
     font-weight: bold;
     text-decoration: solid;
-    color: #383838;
+    padding-bottom:6px;
 }
 
 /* Like button */
-.like-button {
+.div-plb{
+    padding-right:5px;
+    padding-bottom:5px;
+}
+.post-like-button {
+    font-size:14px;
     padding: 2px 6px; /* Reduced padding */
     cursor: pointer;
     border-radius: 5px;
-    /* transition: background-color 0.3s; */
+}
+.div-pdlb{
+
+}
+.post-dislike-button {
+    font-size:14px;
+    padding: 2px 6px; /* Reduced padding */
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.comment-box {
+    width:500px;
+    margin-bottom: 20px;
+}
+
+.comment-box textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    resize: none;
+    background-color: #e8e1e1;
 }
 
 .comments-section {
-    width: 80%;
+    max-width: 800px;
     margin: 20px 0;
 }
-
-.comments-title {
-    font-size: 1.3em; /* Slightly smaller font size */
-    color: #000;
-    margin-bottom: 8px; /* Reduced margin */
-    border-bottom: 1px solid #000;
-    padding-bottom: 5px;
+.cmb-buttondiv{
+    padding-top:6px;
 }
-
-/* Comment styles */
 .comment {
     margin-top: 8px; /* Reduced margin */
-    padding: 8px; /* Reduced padding */
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* Reduced shadow */
+    padding: 15px; /* Reduced padding */
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
-
-.comment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px; /* Reduced margin */
-    border-bottom: 1px solid #ccc; /* Lighter border */
-    padding-bottom: 4px; /* Reduced padding */
-    background-color: #f0f0f0; /* Slightly lighter background */
-    padding: 4px; /* Reduced padding */
+.comment-authorname{
+    font-size: 1em; /* Slightly smaller font size */
+    font-weight:bold;
+    color: #3bd139;
 }
-
-.comment-username {
-    font-size: 0.9em; /* Slightly smaller font size */
-    color: #383838;
+.comment-createdat{
+    padding-top:4px;
 }
-
 .comment-content {
     margin: 8px 0; /* Reduced margin */
-    font-size: 0.9em; /* Slightly smaller font size */
-    color: #383838;
-    color: #110cff;
+    font-size: 1em; /* Slightly smaller font size */
     line-height: 1.4; /* Slightly reduced line height */
 }
-
+.comment-like-button {
+    font-size:12px;
+    padding: 2px 6px; /* Reduced padding */
+    cursor: pointer;
+    border-radius: 5px;
+}
+.comment-dislike-button {
+    font-size:12px;
+    padding: 2px 6px; /* Reduced padding */
+    cursor: pointer;
+    border-radius: 5px;
+}
 /* Comment footer */
 .comment-footer {
     display: flex;
@@ -357,23 +378,18 @@ body {
     align-items: center;
 }
 
-.header-text {
-    font-size: 2em; /* Adjust as needed */
-    margin: 20px 0; /* Add spacing above and below the text */
-    letter-spacing: 2px; /* Adjust spacing between letters */
-    word-spacing: 5px; /* Adjust spacing between words */
-    text-align: center; /* Center align the text */
+.top-links{
+    justify-content:right;
+    padding-bottom:0px;
 }
-
-[class*=classic]:before {
-  content:"Loading...";
+.login-link{
+    font-size: 1em;
+    font-weight:bold;
+    color: #3bd139;
+    padding-right:5px;
 }
-.classic-2 {
-  font-weight: bold;
-  font-family: sans-serif;
-  font-size: 30px;
-  padding-bottom: 8px;
-  background:linear-gradient(currentColor 0 0) 0 100%/0% 3px no-repeat;
-  animation:c2 2s linear infinite;
+.register-link{
+    font-size: 1em;
+    font-weight:bold;
+    color: #3bd139;
 }
-@keyframes c2 {to{background-size: 100% 3px}}

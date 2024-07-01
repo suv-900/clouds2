@@ -15,6 +15,7 @@ export default function PostContent(props:{
                     <h2 className="post-title">{post.title}</h2>
                     <h5 className="post-authorname">{post.authorname}</h5> 
                 </div>
+                <p className="post-content">{post.createdat}</p>
                 <p className="post-content">{post.content}</p>
                 <div className="post-footer">
                    <PostFooter  

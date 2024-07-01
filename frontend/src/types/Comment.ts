@@ -7,7 +7,7 @@ export default class Comment{
     createdAt:string; 
     userLiked:boolean;
     userDisliked:boolean
-
+    newlyAddedComment:boolean;
     constructor(
         id:number,
         authorid:number,
@@ -16,7 +16,8 @@ export default class Comment{
         likes:number,
         createdAt:string,
         userLiked:boolean,
-        userDisliked:boolean
+        userDisliked:boolean,
+        newlyAddedComment:boolean
     ){
         this.id = id;
         this.authorid = authorid;
@@ -26,5 +27,6 @@ export default class Comment{
         this.createdAt = createdAt;
         this.userLiked = userLiked;
         this.userDisliked = userDisliked;
+        this.newlyAddedComment = newlyAddedComment;
     }
 }

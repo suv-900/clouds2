@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import "../../css/styles.css"
+import { AuthContext } from "./PostViewer";
 
 export default function CommentBox(props:{
     postid:number | undefined
 }){
+
+    const token = useContext(AuthContext)
     const[tokenFound,setTokenFound] = useState(false);
-    const[token,setToken] = useState<string>();
     const[comment,setComment] = useState<string>();
     const[displayError,setDisplayError] = useState(false);
 
-    useEffect(()=>{
-        const token = localStorage.getItem("token");
-        if(token !== null){
-            setToken(token);
-            setTokenFound(true);
-        }
-        console.log(props.postid === undefined)
-    },[])
-    
     function vanishErrorMessage(){
         setTimeout(()=>{
             setDisplayError(false);
@@ -33,13 +27,13 @@ export default function CommentBox(props:{
     }
     return(
     <div>
-        {tokenFound && props.postid?
-        <div>
-            <label>add comment</label>
+        {token.length !== 0 && props.postid?
+        <div className="comment-box">
+            <label className="post-content">Add comment:</label><br></br>
             <textarea
                 onChange={(e)=>{setComment(e.target.value)}}
-                />
-            <button onClick={()=>{addComment()}}>submit</button>
+                /><br></br>
+            <button className="post-like-button"onClick={()=>{addComment()}}>submit</button>
         </div>:<></>}
     </div>)
 }

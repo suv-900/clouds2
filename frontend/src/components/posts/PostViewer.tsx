@@ -62,6 +62,8 @@ function PostViewer(){
                 setPost(post);
 
                 const c = res.Comments;
+                if(c != null){
+
                 let commentsarr:Comment[] = [];
                 for(let i =0;i<c.length;i++){
                     const b = c[i];
@@ -73,11 +75,13 @@ function PostViewer(){
                         b.Comment_likes,
                         b.CreatedAt,
                         b.Liked,
-                        b.Disliked
+                        b.Disliked,
+                        false
                     )
                     commentsarr.push(comment);
                 }
                 setComments(commentsarr);
+                }
             }else if(response.status === 401 || 400){
                setTimeout(()=>{
                 navigator("/login")
@@ -108,6 +112,8 @@ function PostViewer(){
                 setPost(post);
 
                 const c = res.Comments;
+                if(c !== null){
+
                 let commentsarr:Comment[] = [];
                 for(let i =0;i<c.length;i++){
                     const b = c[i];
@@ -119,11 +125,13 @@ function PostViewer(){
                         b.Comment_likes,
                         b.CreatedAt,
                         false,
+                        false,
                         false
                     )
                     commentsarr.push(comment);
                 }
                 setComments(commentsarr);
+                }
 
             }else if(response.status === 401){
                 //component to delay and take back to login
