@@ -210,6 +210,25 @@ func GetAllPosts(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 
 }
+func GetFeaturedPosts(w http.ResponseWriter, r *http.Request) {
+	var offset uint64
+	vars := mux.Vars(r)
+	offsetString := vars["offset"]
+	offset, err := strconv.ParseUint(offsetString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	postMetaData := models.GetFeaturedPosts(offset)
+	response, err := json.Marshal(postMetaData)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	w.WriteHeader(200)
+	w.Write(response)
+}
 
 // sends post username and top 5 comments
 func GetPostByID(w http.ResponseWriter, r *http.Request) {

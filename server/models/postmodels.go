@@ -34,7 +34,13 @@ func DeletePost(postid uint64) error {
 	}
 	return nil
 }
-
+func GetFeaturedPosts(offset uint64) []Posts {
+	var postMetaData []Posts
+	limit := 3
+	sql := "SELECT post_id,post_title FROM posts ORDER BY post_likes DESC OFFSET ? LIMIT ?"
+	db.Raw(sql, offset, limit).Scan(&postMetaData)
+	return postMetaData
+}
 func GetAllPosts() []Posts {
 	var posts []Posts
 	db.Raw("SELECT * FROM posts").Scan(&posts)

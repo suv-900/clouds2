@@ -1,11 +1,11 @@
 import React from 'react';
 import {createBrowserRouter,RouterProvider} from 'react-router-dom';
-import PostViewer from './posts/PostViewer';
+import {PostViewer} from './components/posts/PostViewer';
 import Login from './components/user/Login';
 import Register from './components/user/Register';
 import Home from './components/Home';
-import CreatePost from './posts/CreatePost';
-import ErrorPage from './components/ErrorPage';
+import CreatePost from './components/user/CreatePost';
+import ErrorPage from './components/errors/ErrorPage';
 
 const router = createBrowserRouter([
   {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Post from "../types/Post";
+import Post from "../../types/Post";
 import { useNavigate } from "react-router-dom";
 
 export default function PostCule(props:{

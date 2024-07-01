@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Post from "../types/Post";
-import "../css/styles.css";
+import Post from "../../types/Post";
+import "../../css/styles.css"
 import PostFooter from "./PostFooter";
 
 export default function PostContent(props:{

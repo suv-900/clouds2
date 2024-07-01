@@ -1,26 +1,23 @@
 import React, { useContext, useEffect, useState } from "react";
-import CustomError from "../components/CustomError";
+import CustomError from "../errors/CustomError";
 import { AuthContext } from "./PostViewer";
 
-export default function PostComment(props:{
-    id:number,
-    content:string,
-    authorname:string,
-    authorid:number,
+
+//need 1 more work
+export default function PostFooter(props:{
     likes:number,
-    createdAt:string,
-    userLiked:boolean,
-    userDisliked:boolean
+    postLiked:boolean,
+    postDisliked:boolean,
+    postid:number
 }){
-
-    const token = useContext(AuthContext)
-
-    const[likes,setLikes] = useState(props.likes);
-    const[liked,setLiked] = useState(props.userLiked);    
-    const[disliked,setDisliked] = useState(props.userDisliked);    
-    const[displayError,setDisplayError] = useState(false);
     
-   
+    const token = useContext(AuthContext)
+    
+    const[displayError,setDisplayError] = useState(false);
+    const[likes,setLikes] = useState(props.likes);
+    const[liked,setLiked] = useState(props.postLiked);    
+    const[disliked,setDisliked] = useState(props.postDisliked);   
+    
     function vanishErrorMessage(){
         setTimeout(()=>{
             setDisplayError(false);
@@ -32,16 +29,19 @@ export default function PostComment(props:{
         vanishErrorMessage();
     }
 
-    async function likeComment(){
+    async function likePost(){
         if(token.length === 0){
             renderErrorMessage();
             return;
+        }
+        if(disliked){
+            await removeDislike()
         }
 
         const headers = {
             "Authorization":token
         }
-        const response = await fetch(`http://localhost:8000/likecomment/${props.id}`,{
+        const response = await fetch(`http://localhost:8000/likepost/${props.postid}`,{
             method:"POST",
             headers:headers
         })
@@ -64,7 +64,7 @@ export default function PostComment(props:{
         const headers = {
             "Authorization":token
         }
-        const response = await fetch(`http://localhost:8000/removecommentlike/${props.id}`,{
+        const response = await fetch(`http://localhost:8000/removelike/${props.postid}`,{
             method:"POST",
             headers:headers
         })
@@ -79,7 +79,7 @@ export default function PostComment(props:{
         }
     }
     
-    async function dislikeComment(){
+    async function dislikePost(){
         if(token.length === 0){
             renderErrorMessage();
             return;
@@ -92,7 +92,7 @@ export default function PostComment(props:{
         const headers = {
             "Authorization":token
         }
-        const response = await fetch(`http://localhost:8000/dislikecomment/${props.id}`,{
+        const response = await fetch(`http://localhost:8000/dislikepost/${props.postid}`,{
             method:"POST",
             headers:headers
         })
@@ -115,7 +115,7 @@ export default function PostComment(props:{
         const headers = {
             "Authorization":token
         }
-        const response = await fetch(`http://localhost:8000/removedislike/${props.id}`,{
+        const response = await fetch(`http://localhost:8000/removedislike/${props.postid}`,{
             method:"POST",
             headers:headers
         })
@@ -129,28 +129,24 @@ export default function PostComment(props:{
         }
     }
     return(
-        <div id={props.id.toString()}  className="comment">
-            <a href="#">{props.authorname}</a>
-            <div className="comment-content">{props.content}</div>
-            <div className="comment-likes">{likes} likes</div>
-            <div>{props.createdAt}</div>
+        <div>
+            <div className="post-likes">{likes} likes</div>
             <button className="like-button" onClick={()=>{
                 if(liked){
                     removeLike();
                 }else{
-                    likeComment();
+                    likePost();
                 }
                 }}>{liked?"liked":"like"}</button>
             <button className="like-button" onClick={()=>{
                 if(disliked){
                     removeDislike();
                 }else{
-                    dislikeComment();
+                    dislikePost();
                 }
                 }}>{disliked?"disliked":"dislike"}</button>
 
             <CustomError enable={displayError} message={"please login"} />
-
 
         </div>
     )

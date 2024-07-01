@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState,useEffect, useId } from 'react'
 import {useNavigate} from 'react-router-dom'
 import { checkEmail, checkPassword } from '../../utils/utils';
 import { FormError } from '../errors/FormErrors';
@@ -7,7 +7,6 @@ import Loading from '../Loading';
 //checkusername sends 2 requests for bigger names
 export default function Register(){
     const navigate = useNavigate();
-    
     const[username,setUsername] = useState("");
     const[password,setPassword] = useState("");
     const[email,setEmail] = useState("");

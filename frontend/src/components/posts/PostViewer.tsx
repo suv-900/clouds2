@@ -1,12 +1,12 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
-import Post  from "../types/Post";
-import Comment from "../types/Comment";
-import Loading from "../components/Loading";
+import Post  from "../../types/Post";
+import Comment from "../../types/Comment";
+import Loading from "../Loading";
 import { useNavigate } from "react-router-dom";
-import TopHeader from "../components/TopHeader";
+import TopHeader from "../TopHeader";
 import PostComments from "./PostComments";
 import PostContent from "./PostContent";
-import NotFound from "../components/errors/NotFound";
+import NotFound from "../errors/NotFound";
 
 const AuthContext = createContext("");
 

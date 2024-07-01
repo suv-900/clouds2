@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import Comment from "../types/Comment";
+import Comment from "../../types/Comment";
 import PostComment from "./PostComment";
 import { AuthContext } from "./PostViewer";
 

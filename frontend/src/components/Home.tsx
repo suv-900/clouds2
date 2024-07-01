@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Post from "../types/Post";
-import PostCule from "../posts/PostCule";
+import PostCule from "./posts/PostCule";
 import Loading from "./Loading";
 
 export default function Home(){
