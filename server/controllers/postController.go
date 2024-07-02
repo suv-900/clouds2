@@ -301,6 +301,9 @@ func GetPostByID_WithUserPreferences(w http.ResponseWriter, r *http.Request) {
 	}
 
 	comments := models.GetUserCommentReaction(postid, userid)
+	for i := 0; i < len(comments); i++ {
+		comments[i].Createdat_str = comments[i].Createdat.Format(time.RFC1123)
+	}
 	// if err != nil {
 	// 	serverError(&w, err)
 	// 	return

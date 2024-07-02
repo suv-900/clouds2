@@ -130,7 +130,7 @@ func AddComment(postid uint64, userid uint64, username string, comment_content s
 	var commentID uint64
 
 	tx := db.Begin()
-	sql := "INSERT INTO comments (user_id,post_id,username,comment_content,comment_likes,createdat) VALUES(?,?,?,?,?,?) RETURNING comment_id"
+	sql := "INSERT INTO comments (user_id,post_id,username,comment_content,comment_likes) VALUES(?,?,?,?,?) RETURNING comment_id"
 
 	r := tx.Raw(sql, userid, postid, username, comment_content, 0).Scan(&commentID)
 

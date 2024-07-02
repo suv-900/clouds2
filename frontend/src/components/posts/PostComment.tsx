@@ -133,7 +133,7 @@ export default function PostComment(props:{
             newlyAddedComment={comment.newlyAddedComment}
             timeStamp={comment.createdAt}
             />:
-            <time title={comment.createdAt} className="comment-createdat">{timeStatus}</time>
+            <time title={comment.createdAt.substring(0,17)} className="comment-createdat">{timeStatus}</time>
             }
             
             <div className="comment-content">{comment.content}</div>
@@ -162,15 +162,14 @@ export default function PostComment(props:{
 
 function getTime(s:string):string{
     const curr = new Date();
-    // 03 Jul 24 00:57 IST
-    
+    //Tue, 02 Jul 2024 22:29:04 UTC 
     
     const curryear = curr.getFullYear()
     const currmonth = curr.getMonth()
     const currday = curr.getDay()
     const currtime = curr.getTime()
 
-    const past = new Date(s.substring(0,9))
+    const past = new Date(s.substring(0,17))
     const pastyear = past.getFullYear()
     const pastmonth = past.getMonth()
     const pastday = past.getDay()

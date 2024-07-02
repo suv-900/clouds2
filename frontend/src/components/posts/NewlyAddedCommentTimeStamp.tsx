@@ -11,6 +11,6 @@ export default function NewlyAddedCommentTimeStamp(props:{
     },4000)
 
     return(
-        <div className="comment-createdat">{timeStamp}</div>
+        <time title={timeStamp} className="comment-createdat">{timeStamp}</time>
     )
 }

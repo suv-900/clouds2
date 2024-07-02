@@ -46,6 +46,7 @@ type CommentsWithReactions struct {
 	Comment_content string    `db:"comment_content"`
 	Comment_likes   uint64    `db:"comment_likes"`
 	Createdat       time.Time `db:"createdat"`
+	Createdat_str   string
 	Updatedat       time.Time `db:"updatedat"`
 
 	Liked    bool `db:"user_liked"`
