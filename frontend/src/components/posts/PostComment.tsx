@@ -11,7 +11,7 @@ export default function PostComment(props:{
 
     const{comment} = props
     const token = useContext(AuthContext)
-
+    const[timeStatus,setTimeStatus] = useState(getTime(comment.createdAt))
     const[likes,setLikes] = useState(comment.likes);
     const[liked,setLiked] = useState(comment.userLiked);    
     const[disliked,setDisliked] = useState(comment.userDisliked);    
@@ -133,7 +133,7 @@ export default function PostComment(props:{
             newlyAddedComment={comment.newlyAddedComment}
             timeStamp={comment.createdAt}
             />:
-            <time title={comment.createdAt} className="comment-createdat">{comment.createdAt}</time>
+            <time title={comment.createdAt} className="comment-createdat">{timeStatus}</time>
             }
             
             <div className="comment-content">{comment.content}</div>
@@ -158,4 +158,30 @@ export default function PostComment(props:{
 
         </div>
     )
+}
+
+function getTime(s:string):string{
+    const curr = new Date();
+    // 03 Jul 24 00:57 IST
+    
+    
+    const curryear = curr.getFullYear()
+    const currmonth = curr.getMonth()
+    const currday = curr.getDay()
+    const currtime = curr.getTime()
+
+    const past = new Date(s.substring(0,9))
+    const pastyear = past.getFullYear()
+    const pastmonth = past.getMonth()
+    const pastday = past.getDay()
+
+    if((pastyear - curryear) > 0){
+        return `${pastyear-curryear} years ago`;
+    }else if((pastmonth - currmonth) > 0){
+        return `${pastmonth-currmonth} months ago`;
+    }else if((pastday - currday) > 0){
+        return `${pastday - currday} days ago`;
+    }else{
+        return `today`
+    }
 }
