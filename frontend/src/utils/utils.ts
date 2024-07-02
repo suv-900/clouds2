@@ -13,4 +13,14 @@ function checkEmail(email:string):boolean{
     return /@gmail.com/.test(email);
 }
 
+// function decodeTime(s:string):string{
+//     const currentTime = Date() 
+//     let date="";
+//     let time="";
+//     let i = 0;
+//     while(s[i] !== 'T'){
+//         date += s[i]
+//     }
+// }
+
 export {checkPassword,checkEmail};

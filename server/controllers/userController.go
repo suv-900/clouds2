@@ -86,8 +86,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.Password = string(hashedPassword)
-	user.CreatedAt = time.Now()
-	user.UpdatedAt = time.Now()
 
 	var userid uint64
 	userid, err = models.CreateUser(user)

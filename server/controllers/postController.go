@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 
 	//"strconv"
 
@@ -242,12 +243,17 @@ func GetPostByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post, err := models.PostById(postid)
+	year, month, day := post.Createdat.Date()
+	post.Createdat_str = fmt.Sprintf("%d-%d-%d", day, month, year)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
 
-	comments := models.GetAllCommentsByPostID(postid)
+	comments := models.Get5Comments(postid)
+	for i := 0; i < len(comments); i++ {
+		comments[i].Createdat_str = comments[i].Createdat.Local().Format(time.RFC822)
+	}
 	finalRes := models.PostandComments{Post: post, Comments: comments}
 	parsedRes, err := json.Marshal(finalRes)
 	if err != nil {

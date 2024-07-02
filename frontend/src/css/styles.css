@@ -331,7 +331,10 @@ body {
     resize: none;
     background-color: #e8e1e1;
 }
-
+.cmb-label{
+    padding-top:8px;
+    padding-bottom:8px;
+}
 .comments-section {
     max-width: 800px;
     margin: 20px 0;
@@ -344,7 +347,7 @@ body {
     padding: 15px; /* Reduced padding */
     background-color: #1e1e1e;
     border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
 }
 .comment-authorname{
     font-size: 1em; /* Slightly smaller font size */
@@ -352,8 +355,9 @@ body {
     color: #3bd139;
 }
 .comment-createdat{
-    padding-top:4px;
+    padding-left:7px;
 }
+
 .comment-content {
     margin: 8px 0; /* Reduced margin */
     font-size: 1em; /* Slightly smaller font size */
@@ -393,3 +397,4 @@ body {
     font-weight:bold;
     color: #3bd139;
 }
+

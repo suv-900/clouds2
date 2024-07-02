@@ -133,7 +133,7 @@ export default function PostComment(props:{
             newlyAddedComment={comment.newlyAddedComment}
             timeStamp={comment.createdAt}
             />:
-            <div className="comment-createdat">{comment.createdAt}</div>
+            <time title={comment.createdAt} className="comment-createdat">{comment.createdAt}</time>
             }
             
             <div className="comment-content">{comment.content}</div>

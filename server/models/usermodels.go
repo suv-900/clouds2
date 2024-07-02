@@ -50,7 +50,7 @@ func CreateUser(user Users) (uint64, error) {
 		go func() {
 			tx := db.Begin()
 			sql := "INSERT INTO users (username,email,password,createdat,updatedat) VALUES(?,?,?,?,?) RETURNING user_id"
-			res := tx.Raw(sql, user.Username, user.Email, user.Password, user.CreatedAt, user.UpdatedAt).Scan(&userid)
+			res := tx.Raw(sql, user.Username, user.Email, user.Password, user.Createdat, user.Updatedat).Scan(&userid)
 			if res.Error != nil {
 				tx.Rollback()
 				pipe2 <- false

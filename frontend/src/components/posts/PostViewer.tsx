@@ -57,7 +57,7 @@ function PostViewer(){
                     k.Post_likes,
                     res.PostLikedByUser,
                     res.PostDislikedByUser,
-                    k.Createdat
+                    k.Createdat_str
                 )
                 setPost(post);
 
@@ -73,7 +73,7 @@ function PostViewer(){
                         b.Username,
                         b.Comment_content,
                         b.Comment_likes,
-                        b.CreatedAt,
+                        b.Createdat_str,
                         b.Liked,
                         b.Disliked,
                         false
@@ -107,7 +107,7 @@ function PostViewer(){
                     k.Post_likes,
                     false,
                     false,
-                    k.Createdat
+                    k.Createdat_str
                 )
                 setPost(post);
 
@@ -123,7 +123,7 @@ function PostViewer(){
                         b.Username,
                         b.Comment_content,
                         b.Comment_likes,
-                        b.CreatedAt,
+                        b.Createdat_str,
                         false,
                         false,
                         false

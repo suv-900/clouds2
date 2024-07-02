@@ -6,7 +6,6 @@ import (
 	"io"
 	"strconv"
 	"sync"
-	"time"
 
 	"net/http"
 
@@ -60,7 +59,6 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 		User_id:         userid,
 		Comment_content: comment_content,
 		Username:        username,
-		CreatedAt:       time.Now(),
 		Comment_likes:   0,
 	}
 	reply, err := json.Marshal(comment)

@@ -14,13 +14,14 @@ type Users struct {
 }
 
 type Posts struct {
-	Post_id      uint64    `db:"post_id"`
-	Author_id    uint64    `db:"author_id"`
-	Author_name  string    `db:"author_name"`
-	Post_title   string    `db:"post_title"`
-	Post_content string    `db:"post_content"`
-	Post_likes   uint32    `db:"post_likes"`
-	Createdat    time.Time `db:"createdat"`
+	Post_id       uint64    `db:"post_id"`
+	Author_id     uint64    `db:"author_id"`
+	Author_name   string    `db:"author_name"`
+	Post_title    string    `db:"post_title"`
+	Post_content  string    `db:"post_content"`
+	Post_likes    uint32    `db:"post_likes"`
+	Createdat     time.Time `db:"createdat"`
+	Createdat_str string
 	// UpdatedAt    time.Time `db:"updatedat"`
 }
 
@@ -32,7 +33,9 @@ type Comment struct {
 	Comment_content string    `db:"comment_content"`
 	Comment_likes   uint64    `db:"comment_likes"`
 	Createdat       time.Time `db:"createdat"`
+	Createdat_str   string
 	Updatedat       time.Time `db:"updatedat"`
+	Updatedat_str   string
 }
 
 type CommentsWithReactions struct {
