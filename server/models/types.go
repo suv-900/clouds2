@@ -9,8 +9,8 @@ type Users struct {
 	Password  string    `db:"password"`
 	ImageURL  string    `db:"imageURL"`
 	Active    bool      `db:"active"`
-	CreatedAt time.Time `db:"createdAt"`
-	UpdatedAt time.Time `db:"updatedAt"`
+	Createdat time.Time `db:"createdAt"`
+	Updatedat time.Time `db:"updatedAt"`
 }
 
 type Posts struct {
@@ -20,7 +20,7 @@ type Posts struct {
 	Post_title   string    `db:"post_title"`
 	Post_content string    `db:"post_content"`
 	Post_likes   uint32    `db:"post_likes"`
-	CreatedAt    time.Time `db:"createdat"`
+	Createdat    time.Time `db:"createdat"`
 	// UpdatedAt    time.Time `db:"updatedat"`
 }
 
@@ -31,8 +31,8 @@ type Comment struct {
 	Username        string    `db:"username"`
 	Comment_content string    `db:"comment_content"`
 	Comment_likes   uint64    `db:"comment_likes"`
-	CreatedAt       time.Time `db:"createdat"`
-	UpdatedAt       time.Time `db:"updatedat"`
+	Createdat       time.Time `db:"createdat"`
+	Updatedat       time.Time `db:"updatedat"`
 }
 
 type CommentsWithReactions struct {
@@ -42,8 +42,8 @@ type CommentsWithReactions struct {
 	Username        string    `db:"username"`
 	Comment_content string    `db:"comment_content"`
 	Comment_likes   uint64    `db:"comment_likes"`
-	CreatedAt       time.Time `db:"createdat"`
-	UpdatedAt       time.Time `db:"updatedat"`
+	Createdat       time.Time `db:"createdat"`
+	Updatedat       time.Time `db:"updatedat"`
 
 	Liked    bool `db:"user_liked"`
 	Disliked bool `db:"user_disliked"`
