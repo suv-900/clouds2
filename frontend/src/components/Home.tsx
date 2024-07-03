@@ -8,6 +8,7 @@ export default function Home(){
     const[offset,setOffset] = useState(0);
     const[loading,setLoading] = useState(false);
     const[fetching,setFetching] = useState(false);
+    const[hasMore,setHasmore] = useState(true)
 
     useEffect(()=>{
         window.addEventListener("scroll",handleScroll)    
@@ -25,11 +26,9 @@ export default function Home(){
 
     useEffect(()=>{
         if(!fetching) return;
-        setOffset(prevValue=>prevValue+1)
+        setOffset(offset+1)
         getPosts()
-        setTimeout(()=>{
-            setFetching(false)
-        },3000)
+        
     },[fetching])
 
     function startLoading(){
@@ -40,9 +39,20 @@ export default function Home(){
         },3000)
     }
     async function getPosts(){
+        if(!hasMore){
+            setFetching(false);
+            return;
+        }
+
         const response = await fetch(`http://localhost:8000/posts/getposts?offset=${offset}&limit=5`)
         const res = await response.json();
-        if(res === null) return
+        if(res === null){
+            setHasmore(false)
+            setFetching(false)
+            return
+        } 
+
+        let postsarr = posts 
         for(let i=0;i<res.length;i++){
             const k = res[i];
             const post = new Post(
@@ -56,8 +66,12 @@ export default function Home(){
                     false,
                     ""
             )
-            setPosts(prevArr=>[...prevArr,post])
+            postsarr.push(post)
         }
+        setTimeout(()=>{
+            setFetching(false)
+            setPosts(prevValue=>postsarr)
+        },3000)
     }
 
     return(
@@ -68,7 +82,11 @@ export default function Home(){
                 <h3>Home</h3>
                 {posts.map(post=><PostCule post={post}/>)}
 
-                {fetching && <span className="scroll-loader"></span>} 
+                {fetching && 
+                <div className="scroll-loader-div">
+                    <span className="scroll-loader"></span>
+                </div>}
+                {!hasMore && <div className="scroll-loader-div">End.</div>} 
             </div>:<></>}
         </div>
     )

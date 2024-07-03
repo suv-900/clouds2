@@ -20,6 +20,9 @@ body {
     text-align: center; /* Center align the text */
 }
 
+.scroll-loader-div{
+    padding-left: 195px;
+}
 .scroll-loader {
     width: 48px;
     height: 48px;
@@ -40,19 +43,25 @@ body {
     }
     } 
 
+
+.loading-div{
+    padding-top:400px;
+}
 [class*=classic]:before {
   content:"Loading...";
 }
 .classic-2 {
-  font-weight: bold;
-  font-family: sans-serif;
-  font-size: 30px;
-  padding-bottom: 8px;
-  background:linear-gradient(currentColor 0 0) 0 100%/0% 3px no-repeat;
-  animation:c2 2s linear infinite;
+    color:rgb(214, 209, 209);
+    font-weight: bold;
+    font-family: sans-serif;
+    font-size: 30px;
+    padding-bottom: 8px;
+    background:linear-gradient(currentColor 0 0) 0 100%/0% 3px no-repeat;
+    animation:c2 2s linear infinite;
 }
 @keyframes c2 {to{background-size: 100% 3px}}
-/* Container for the post creation form */
+
+
 .form-container {
     width: 100%;
     max-width: 400px;
@@ -369,6 +378,7 @@ body {
     font-size: 1em; /* Slightly smaller font size */
     font-weight:bold;
     color: #3bd139;
+    text-decoration: none;
 }
 .comment-createdat{
     padding-left:7px;
