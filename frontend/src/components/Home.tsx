@@ -19,16 +19,15 @@ export default function Home(){
     },[])
 
     function handleScroll(){
-        if(window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight){
+        if(window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && !fetching){
             setFetching(true);
         }
     }
 
     useEffect(()=>{
         if(!fetching) return;
-        setOffset(offset+1)
+        setOffset(prevValue=>prevValue+1)
         getPosts()
-        
     },[fetching])
 
     function startLoading(){
