@@ -245,12 +245,12 @@ func GetPostByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post, err := models.PostById(postid)
-	year, month, day := post.Createdat.Date()
-	post.Createdat_str = fmt.Sprintf("%d-%d-%d", day, month, year)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
+	year, month, day := post.Createdat.Date()
+	post.Createdat_str = fmt.Sprintf("%d-%d-%d", day, month, year)
 
 	comments, err := models.GetComments(postid, 5, 0)
 	if err != nil {
@@ -296,6 +296,8 @@ func GetPostByID_WithUserPreferences(w http.ResponseWriter, r *http.Request) {
 		serverError(&w, err)
 		return
 	}
+	year, month, day := post.Createdat.Date()
+	post.Createdat_str = fmt.Sprintf("%d-%d-%d", day, month, year)
 
 	userLikedPost, userDislikedPost, err := models.CheckUserReaction(userid, postid)
 	if err != nil {

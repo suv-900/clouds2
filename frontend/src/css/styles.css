@@ -299,15 +299,20 @@ body {
     margin: 0;
     color: #e0e0e0;
 }
-.post-username {
-    font-size: 1.2em;
-    color: #e0e0e0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    display: block;
-    margin-bottom: 10px;
+.post-authorname{
+    padding-top: 3px;
+    font-size: 1em;
+    display: inline-block;
+    cursor: pointer;
+    text-decoration: none;
 }
-
+.post-authorname:hover{
+    color: #3bd139;
+}
+.post-createdat{
+    display: block;
+    padding-top:6px;
+}
 .post-content {
     font-weight:500;
     line-height: 1.6;

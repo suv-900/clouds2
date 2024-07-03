@@ -2,20 +2,13 @@ package models
 
 import (
 	"errors"
-	"fmt"
 )
 
 func CreatePost(post Posts) (uint64, error) {
 
-	userexists := CheckUserExists(post.Author_id)
-	if !userexists {
-		fmt.Println("User doesnt exists.Post Creation Failed")
-		return 0, errors.New("user doesnt exists.Post Creation Failed")
-	}
-
 	var postid uint64
 	tx := db.Begin()
-	r := tx.Raw("INSERT INTO posts (post_title,post_content,author_id,post_likes) VALUES(?,?,?,?) RETURNING post_id", post.Post_title, post.Post_content, post.Author_id, 0).Scan(&postid)
+	r := tx.Raw("INSERT INTO posts (post_title,post_content,author_id,post_likes,author_name) VALUES(?,?,?,?,?) RETURNING post_id", post.Post_title, post.Post_content, post.Author_id, 0, post.Author_name).Scan(&postid)
 	if r.Error != nil {
 		tx.Rollback()
 		return postid, r.Error
