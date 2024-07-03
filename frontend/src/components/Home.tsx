@@ -6,9 +6,8 @@ import Loading from "./Loading";
 export default function Home(){
     const[posts,setPosts] = useState<Post[]>([]); 
     const[offset,setOffset] = useState(0);
-    const[render,setRender] = useState(false);
     const[loading,setLoading] = useState(false);
-    const[isFetching,setisFetching] = useState(false);
+    const[fetching,setFetching] = useState(false);
 
     useEffect(()=>{
         window.addEventListener("scroll",handleScroll)    
@@ -20,10 +19,19 @@ export default function Home(){
 
     function handleScroll(){
         if(window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight){
-            setOffset(prevValue=>prevValue+1)
-            getPosts()
+            setFetching(true);
         }
     }
+
+    useEffect(()=>{
+        if(!fetching) return;
+        setOffset(prevValue=>prevValue+1)
+        getPosts()
+        setTimeout(()=>{
+            setFetching(false)
+        },3000)
+    },[fetching])
+
     function startLoading(){
         setLoading(true);
 
@@ -32,9 +40,9 @@ export default function Home(){
         },3000)
     }
     async function getPosts(){
-        setisFetching(true)
         const response = await fetch(`http://localhost:8000/posts/getposts?offset=${offset}&limit=5`)
         const res = await response.json();
+        if(res === null) return
         for(let i=0;i<res.length;i++){
             const k = res[i];
             const post = new Post(
@@ -48,12 +56,8 @@ export default function Home(){
                     false,
                     ""
             )
-            // setPosts(prevArr=>[...prevArr,post])
-            posts.push(post)
+            setPosts(prevArr=>[...prevArr,post])
         }
-        setTimeout(()=>{
-            setisFetching(false)
-        },5000)
     }
 
     return(
@@ -64,7 +68,7 @@ export default function Home(){
                 <h3>Home</h3>
                 {posts.map(post=><PostCule post={post}/>)}
 
-                {isFetching && <span className="scroll-loader"></span>} 
+                {fetching && <span className="scroll-loader"></span>} 
             </div>:<></>}
         </div>
     )
