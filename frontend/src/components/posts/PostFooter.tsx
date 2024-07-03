@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import CustomError from "../errors/CustomError";
 import { AuthContext } from "./PostViewer";
+import { BiSolidDislike, BiSolidLike } from "react-icons/bi";
 
 
 //need 1 more work
@@ -128,29 +129,31 @@ export default function PostFooter(props:{
             
         }
     }
+    const likebuttonstyles = {
+        "color":liked?"#3bd139":""
+    }
+    const dislikebuttonstyles ={
+        "color":disliked?"rgb(211, 38, 38)":""
+    }
     return(
         <div>
             <div className="post-likes">{likes} likes</div>
 
-            <div className="div-plb">
-            <button className="post-like-button" onClick={()=>{
+            <BiSolidLike size="20"style={likebuttonstyles} className="post-like-button" onClick={()=>{
                 if(liked){
                     removeLike();
                 }else{
                     likePost();
                 }
-                }}>{liked?"liked":"like"}</button>
+                }}></BiSolidLike>
 
-            </div>
-            <div className="div-plb">
-            <button className="post-dislike-button" onClick={()=>{
+            <BiSolidDislike size="20" style={dislikebuttonstyles} className="post-dislike-button" onClick={()=>{
                 if(disliked){
                     removeDislike();
                 }else{
                     dislikePost();
                 }
-                }}>{disliked?"disliked":"dislike"}</button>
-            </div>
+                }}></BiSolidDislike>
 
             <CustomError enable={displayError} message={"please login"} />
 

@@ -5,7 +5,6 @@ import PostCule from "./posts/PostCule";
 import Loading from "./Loading";
 
 export default function Home(){
-    const[token,setToken] = useState<string>();
     const[posts,setPosts] = useState<Post[]>([]); 
     const[offset,setOffset] = useState(0);
     const[render,setRender] = useState(false);
@@ -13,10 +12,7 @@ export default function Home(){
     
     useEffect(()=>{
         startLoading()
-        const token = localStorage.getItem("token");
-        if(token !== null){
-            setToken(token);
-        }
+        
         getPosts()
     },[])
     // const location = useLocation();
@@ -31,7 +27,7 @@ export default function Home(){
         },3000)
     }
     async function getPosts(){
-        const response = await fetch(`http://localhost:8000/posts/getall`)
+        const response = await fetch(`http://localhost:8000/posts/getposts/${offset}`)
         const res = await response.json();
         console.log(res);
         for(let i=0;i<res.length;i++){
@@ -39,15 +35,14 @@ export default function Home(){
             const post = new Post(
                     k.Post_id,
                     k.Post_title,
-                    k.Post_content,
+                    "",
                     k.Author_name,
-                    k.Author_id,
+                    0,
                     k.Post_likes,
                     false,
                     false,
-                    k.CreatedAt
+                    ""
             )
-            console.log(post); 
             posts.push(post);    
         }
     }

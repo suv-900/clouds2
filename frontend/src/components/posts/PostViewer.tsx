@@ -34,7 +34,6 @@ function PostViewer(){
     },[])
 
     async function getPost(postid:number ){
-        console.log(token)
         if(token !== null){
             const requestHeaders = {
                 "Authorization":token

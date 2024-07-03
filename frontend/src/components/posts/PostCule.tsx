@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Post from "../../types/Post";
 import { useNavigate } from "react-router-dom";
+import {BiSolidLike,BiSolidDislike} from "react-icons/bi"
 
 export default function PostCule(props:{
     post:Post
@@ -9,9 +10,6 @@ export default function PostCule(props:{
     const[likes,setLikes] = useState(post.likes);
     const[token,setToken] = useState<string>();
     
-    const authorLink = `http://localhost:3000/user/${post.authorid}`;
-    const postLink = `http://localhost:3000/post/view?id=${post.id}`;
-
     const navigate = useNavigate();
    
     useEffect(()=>{
@@ -21,6 +19,13 @@ export default function PostCule(props:{
         }
     },[])
 
+    function gotoPost(){
+        navigate(`/post/view?id=${post.id}`)
+    }
+
+    function gotoUser(){
+        navigate(`/users/${post.authorname}`)
+    }
 
     async function likePost(){
         if(!token){
@@ -68,14 +73,12 @@ export default function PostCule(props:{
     return(
         <div>
         <div className="post-container">
-            <a href={postLink}  target="_blank" className="post-link">{post.title}</a>
-            <a href={authorLink} className="author-name" >{post.authorname} author</a>
-            <div className="post-meta">
-                <div className="creation-date">{post.createdat}</div>
-                <div className="post-likes">{likes} likes</div>
-            </div>
-            <button className="like-button" onClick={()=>{likePost()}}>like</button>
-            <button className="dislike-button" onClick={()=>{dislikePost()}}>dislike</button>
+            <a onClick={(e)=>{gotoPost()}}  className="post-link">{post.title}</a>
+            <a onClick={()=>{gotoUser()}} className="author-name" >{post.authorname} author</a>
+            <div className="post-likes">{likes} likes</div>
+            
+            <BiSolidLike size="20" className="like-button"  onClick={()=>{likePost()}}>like</BiSolidLike>
+            <BiSolidDislike size="20" className="dislike-button" onClick={()=>{dislikePost()}}>dislike</BiSolidDislike>
         </div>
         <div className="post-separator"></div>
         </div>

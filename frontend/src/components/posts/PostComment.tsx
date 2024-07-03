@@ -4,6 +4,7 @@ import { AuthContext } from "./PostViewer";
 import Comment from "../../types/Comment";
 import CommentTimeStamp from "./NewlyAddedCommentTimeStamp";
 import NewlyAddedCommentTimeStamp from "./NewlyAddedCommentTimeStamp";
+import { BiSolidDislike, BiSolidLike } from "react-icons/bi";
 
 export default function PostComment(props:{
    comment:Comment 
@@ -125,6 +126,13 @@ export default function PostComment(props:{
             
         }
     }
+
+    const likebuttonstyles = {
+        "color":liked?"#3bd139":""
+    }
+    const dislikebuttonstyles ={
+        "color":disliked?"rgb(211, 38, 38)":""
+    }
     return(
         <div id={comment.id.toString()}  className="comment">
             <a href={`http://localhost:3000/users/${comment.authorname}`} className="comment-authorname">{comment.authorname}</a>
@@ -138,20 +146,20 @@ export default function PostComment(props:{
             
             <div className="comment-content">{comment.content}</div>
             <div className="comment-likes">{likes} likes</div>
-            <button className="comment-like-button" onClick={()=>{
+            <BiSolidLike size="20" style={likebuttonstyles} className="comment-like-button" onClick={()=>{
                 if(liked){
                     removeLike();
                 }else{
                     likeComment();
                 }
-                }}>{liked?"liked":"like"}</button>
-            <button className="comment-dislike-button" onClick={()=>{
+                }}></BiSolidLike>
+            <BiSolidDislike size="20" style={dislikebuttonstyles} className="comment-dislike-button" onClick={()=>{
                 if(disliked){
                     removeDislike();
                 }else{
                     dislikeComment();
                 }
-                }}>{disliked?"disliked":"dislike"}</button>
+                }}>{disliked?"disliked":"dislike"}</BiSolidDislike>
 
             <CustomError enable={displayError} message={"please login"} />
 
@@ -174,7 +182,7 @@ function getTime(s:string):string{
 
     if((curryear - pastyear) > 0){
         const diff = curryear - pastyear
-        if(diff == 1){
+        if(diff === 1){
             return `${curryear-pastyear} year ago`;
         }else{
             return `${curryear-pastyear} year ago`;

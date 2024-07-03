@@ -178,7 +178,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-func GetPosts(w http.ResponseWriter, r *http.Request) {
+func GetPostsMetaData(w http.ResponseWriter, r *http.Request) {
 	var offset uint64
 	vars := mux.Vars(r)
 	offsetString := vars["offset"]
@@ -187,7 +187,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		serverError(&w, err)
 		return
 	}
-	posts := models.GetPosts(offset * 5)
+	posts := models.GetPostsMetaData(offset * 5)
 
 	response, err := json.Marshal(posts)
 	if err != nil {
@@ -198,9 +198,9 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 }
 
-func GetAllPosts(w http.ResponseWriter, r *http.Request) {
+func GetAllPostsMetaData(w http.ResponseWriter, r *http.Request) {
 
-	posts := models.GetAllPosts()
+	posts := models.GetAllPostsMetaData()
 
 	response, err := json.Marshal(posts)
 	if err != nil {
