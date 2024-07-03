@@ -6,6 +6,7 @@ import (
 	"io"
 	"strconv"
 	"sync"
+	"time"
 
 	"net/http"
 
@@ -304,3 +305,67 @@ func RemoveDislikeFromComment(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 }
+
+func GetComments(w http.ResponseWriter, r *http.Request) {
+	offsetString := r.URL.Query().Get("offset")
+	limitString := r.URL.Query().Get("limit")
+	postidString := r.URL.Query().Get("postid")
+
+	offset, err := strconv.ParseUint(offsetString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	limit, err := strconv.ParseUint(limitString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	postid, err := strconv.ParseUint(postidString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	comments, err := models.GetComments(postid, limit, offset)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	for i := 0; i < len(comments); i++ {
+		comments[i].Createdat_str = comments[i].Createdat.Local().Format(time.RFC822)
+	}
+
+	response, err := json.Marshal(comments)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write(response)
+}
+
+// func GetCommentsWithToken(w http.ResponseWriter, r *http.Request) {
+// 	offsetString := r.URL.Query().Get("offset")
+// 	limitString := r.URL.Query().Get("limit")
+// 	postidString := r.URL.Query().Get("postid")
+
+// 	offset, err := strconv.ParseUint(offsetString, 10, 16)
+// 	if err != nil {
+// 		serverError(&w, err)
+// 		return
+// 	}
+// 	limit, err := strconv.ParseUint(limitString, 10, 16)
+// 	if err != nil {
+// 		serverError(&w, err)
+// 		return
+// 	}
+// 	postid, err := strconv.ParseUint(postidString, 10, 16)
+// 	if err != nil {
+// 		serverError(&w, err)
+// 		return
+// 	}
+
+// 	comments:=models.GetUserCommentReaction()
+// }

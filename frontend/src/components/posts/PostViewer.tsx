@@ -38,7 +38,7 @@ function PostViewer(){
             const requestHeaders = {
                 "Authorization":token
             }
-            const response = await fetch(`http://localhost:8000/viewPostToken/${postid}`,{
+            const response = await fetch(`http://localhost:8000/viewpost-token?postid=${postid}`,{
                 headers:requestHeaders,
                 method:"GET"
             })
@@ -91,7 +91,7 @@ function PostViewer(){
 
             }
         }else{
-            const response = await fetch(`http://localhost:8000/viewpost/${postid}`)
+            const response = await fetch(`http://localhost:8000/viewpost?postid=${postid}`)
             if(response.ok){
                 const res = await response.json();
                 console.log(res);

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Comment from "../../types/Comment";
 import PostComment from "./PostComment";
 import { AuthContext } from "./PostViewer";
@@ -7,14 +7,106 @@ export default function PostComments(props:{
     comments:Comment[] ,
     postid:number 
 }){ 
-
-    const token = useContext(AuthContext)
-
     const[commentsList,setCommentsList] = useState(props.comments)
     const[comment,setComment] = useState<string>();
     const[displayError,setDisplayError] = useState(false);
     const[error,setError] = useState("");
-   
+    const[fetching,setFetching] = useState(false);
+    const[offset,setOffset] = useState(1);
+    const[hasMore,setHasmore] = useState(true);
+
+    const token = useContext(AuthContext)
+    
+    useEffect(()=>{
+        window.addEventListener("scroll",handleScroll)    
+        
+        return ()=>window.removeEventListener("scroll",handleScroll)
+    },[])
+
+    function handleScroll(){
+        if(window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && !fetching){
+            setFetching(true);
+        }
+    }
+
+    useEffect(()=>{
+        if(!fetching) return;
+        setOffset(prevValue=>prevValue+1)
+        getComments()
+    },[fetching])
+
+    async function getComments(){
+        if(!hasMore){
+            setFetching(false);
+            return;
+        }
+
+        if(token){
+
+        const response = await fetch(`http://localhost:8000/comments/getcomments?limit=5&offset=${offset}&postid=${props.postid}`,{
+            method:"GET",
+        })
+        const res = await response.json();
+        if(res === null){
+            setHasmore(false);
+            setFetching(false);
+            return;
+        }
+        let commentsarr = commentsList
+        for(let i =0;i<res.length;i++){
+            let b = res[i];
+            const comment = new Comment(
+                b.Comment_id,
+                b.User_id,
+                b.Username,
+                b.Comment_content,
+                b.Comment_likes,
+                b.Createdat_str,
+                b.Liked,
+                b.Disliked,
+                false
+            )
+            commentsarr.push(comment);
+        }
+        setTimeout(()=>{
+            setFetching(false);
+            setCommentsList(commentsarr);
+        },3000)
+        }else{
+            const response = await fetch(`http://localhost:8000/comments/getcomments?limit=5&offset=${offset}&postid=${props.postid}`,{
+            method:"GET",
+        })
+        const res = await response.json();
+        if(res === null){
+            setHasmore(false);
+            setFetching(false);
+            return;
+        }
+        let commentsarr = commentsList
+        for(let i =0;i<res.length;i++){
+            let b = res[i];
+            const comment = new Comment(
+                b.Comment_id,
+                b.User_id,
+                b.Username,
+                b.Comment_content,
+                b.Comment_likes,
+                b.Createdat_str,
+                b.Liked,
+                b.Disliked,
+                false
+            )
+            commentsarr.push(comment);
+        }
+        setTimeout(()=>{
+            setFetching(false);
+            setCommentsList(commentsarr);
+        },3000)
+        }
+    }
+
+
+  
     function vanishErrorMessage(){
         setTimeout(()=>{
             setDisplayError(false);
@@ -92,8 +184,15 @@ export default function PostComments(props:{
         
         </div>
             <div className="comments-section">
-                <div className="comment-title">Comments: {commentsList.length}</div>
-                {commentsList.map((comment)=><PostComment comment={comment}/>)}
+                <div>
+                    <div className="comment-title">Comments: {commentsList.length}</div>
+                    {commentsList.map((comment)=><PostComment comment={comment}/>)}
+                </div>
+                {fetching && 
+                <div className="scroll-loader-div">
+                    <span className="scroll-loader"></span>
+                </div>
+                }
             </div>
         </div>
     )

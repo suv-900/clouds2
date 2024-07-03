@@ -120,11 +120,14 @@ func GetAllCommentsByPostID(postid uint64) []Comment {
 	db.Raw(sql, postid).Scan(&comments)
 	return comments
 }
-func Get5Comments(postid uint64) []Comment {
+func GetComments(postid uint64, limit uint64, offset uint64) ([]Comment, error) {
 	var comments []Comment
-	sql := "SELECT * FROM comments WHERE post_id=? ORDER BY comment_likes DESC LIMIT 5"
-	db.Raw(sql, postid).Scan(&comments)
-	return comments
+	sql := "SELECT * FROM comments WHERE post_id=? ORDER BY comment_likes DESC LIMIT ? OFFSET ?"
+	r := db.Raw(sql, postid, limit, offset*limit).Scan(&comments)
+	if r.Error != nil {
+		return comments, r.Error
+	}
+	return comments, nil
 }
 func AddComment(postid uint64, userid uint64, username string, comment_content string) (uint64, error) {
 	var commentID uint64

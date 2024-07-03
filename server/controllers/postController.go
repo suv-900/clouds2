@@ -179,7 +179,6 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPostsMetaData(w http.ResponseWriter, r *http.Request) {
-	var offset uint64
 	offsetString := r.URL.Query().Get("offset")
 	limitString := r.URL.Query().Get("limit")
 
@@ -238,10 +237,8 @@ func GetFeaturedPosts(w http.ResponseWriter, r *http.Request) {
 
 // sends post username and top 5 comments
 func GetPostByID(w http.ResponseWriter, r *http.Request) {
-	var postid uint64
-	vars := mux.Vars(r)
-	postidstr := vars["id"]
-	postid, err := strconv.ParseUint(postidstr, 10, 64)
+	postidString := r.URL.Query().Get("postid")
+	postid, err := strconv.ParseUint(postidString, 10, 16)
 	if err != nil {
 		serverError(&w, err)
 		return
@@ -255,7 +252,11 @@ func GetPostByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	comments := models.Get5Comments(postid)
+	comments, err := models.GetComments(postid, 5, 0)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
 	for i := 0; i < len(comments); i++ {
 		comments[i].Createdat_str = comments[i].Createdat.Local().Format(time.RFC822)
 	}
@@ -283,11 +284,8 @@ func GetPostByID_WithUserPreferences(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var postidstr string
-	var postid uint64
-	vars := mux.Vars(r)
-	postidstr = vars["id"]
-	postid, err := strconv.ParseUint(postidstr, 10, 64)
+	postidString := r.URL.Query().Get("postid")
+	postid, err := strconv.ParseUint(postidString, 10, 16)
 	if err != nil {
 		serverError(&w, err)
 		return
