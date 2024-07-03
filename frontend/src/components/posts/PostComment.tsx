@@ -11,7 +11,7 @@ export default function PostComment(props:{
 
     const{comment} = props
     const token = useContext(AuthContext)
-    const[timeStatus,setTimeStatus] = useState(getTime(comment.createdAt))
+    const[timeStatus,setTimeStatus] = useState(getTime(comment.createdAt.substring(0,10)))
     const[likes,setLikes] = useState(comment.likes);
     const[liked,setLiked] = useState(comment.userLiked);    
     const[disliked,setDisliked] = useState(comment.userDisliked);    
@@ -174,12 +174,30 @@ function getTime(s:string):string{
     const pastmonth = past.getMonth()
     const pastday = past.getDay()
 
-    if((pastyear - curryear) > 0){
-        return `${pastyear-curryear} years ago`;
-    }else if((pastmonth - currmonth) > 0){
-        return `${pastmonth-currmonth} months ago`;
-    }else if((pastday - currday) > 0){
-        return `${pastday - currday} days ago`;
+    console.log(past)
+    console.log(pastyear+" "+pastmonth+" "+pastday)
+
+    if((curryear - pastyear) > 0){
+        const diff = curryear - pastyear
+        if(diff == 1){
+            return `${curryear-pastyear} year ago`;
+        }else{
+            return `${curryear-pastyear} year ago`;
+        }
+    }else if((currmonth - pastmonth) > 0){
+        const diff = currmonth - pastmonth
+        if(diff === 1){
+            return `${currmonth - pastmonth} month ago`;
+        }else{
+            return `${currmonth - pastmonth} months ago`;
+        }
+    }else if((currday - pastday) > 0){
+        const diff = currday - pastday
+        if(diff === 1){
+            return `${currday - pastday} day ago`;
+        }else{
+            return `${currday - pastday} days ago`;
+        }
     }else{
         return `today`
     }
