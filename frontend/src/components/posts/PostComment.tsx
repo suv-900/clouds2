@@ -162,20 +162,15 @@ export default function PostComment(props:{
 
 function getTime(s:string):string{
     const curr = new Date();
-    //Tue, 02 Jul 2024 22:29:04 UTC 
     
     const curryear = curr.getFullYear()
     const currmonth = curr.getMonth()
     const currday = curr.getDay()
-    const currtime = curr.getTime()
 
     const past = new Date(s.substring(0,17))
     const pastyear = past.getFullYear()
     const pastmonth = past.getMonth()
     const pastday = past.getDay()
-
-    console.log(past)
-    console.log(pastyear+" "+pastmonth+" "+pastday)
 
     if((curryear - pastyear) > 0){
         const diff = curryear - pastyear
