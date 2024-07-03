@@ -18,10 +18,10 @@ func HandleRoutes(router *mux.Router) {
 	router.HandleFunc("/likecomment/{id:[0-9]+}", controllers.LikeComment).Methods("POST")
 	router.HandleFunc("/dislikecomment/{id:[0-9]+}", controllers.DislikeComment).Methods("POST")
 
-	router.HandleFunc("/posts/getposts/{offset:[0-9]+}", controllers.GetPostsMetaData).Methods("GET")
+	router.HandleFunc("/posts/getposts", controllers.GetPostsMetaData).Methods("GET")
 
 	router.HandleFunc("/posts/getall", controllers.GetAllPostsMetaData).Methods("GET")
-	router.HandleFunc("/posts/get-featured-posts/{offset:[0-9]+}", controllers.GetFeaturedPosts).Methods("GET")
+	router.HandleFunc("/posts/get-featured-posts", controllers.GetFeaturedPosts).Methods("GET")
 
 	router.HandleFunc("/viewpost/{id:[0-9]+}", controllers.GetPostByID).Methods("GET")
 	router.HandleFunc("/viewPostToken/{id:[0-9]+}", controllers.GetPostByID_WithUserPreferences).Methods("GET")

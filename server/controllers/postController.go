@@ -180,14 +180,20 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 
 func GetPostsMetaData(w http.ResponseWriter, r *http.Request) {
 	var offset uint64
-	vars := mux.Vars(r)
-	offsetString := vars["offset"]
+	offsetString := r.URL.Query().Get("offset")
+	limitString := r.URL.Query().Get("limit")
+
 	offset, err := strconv.ParseUint(offsetString, 10, 16)
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
-	posts := models.GetPostsMetaData(offset * 5)
+	limit, err := strconv.ParseUint(limitString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	posts := models.GetPostsMetaData(offset, limit)
 
 	response, err := json.Marshal(posts)
 	if err != nil {
@@ -213,8 +219,7 @@ func GetAllPostsMetaData(w http.ResponseWriter, r *http.Request) {
 }
 func GetFeaturedPosts(w http.ResponseWriter, r *http.Request) {
 	var offset uint64
-	vars := mux.Vars(r)
-	offsetString := vars["offset"]
+	offsetString := r.URL.Query().Get("offset")
 	offset, err := strconv.ParseUint(offsetString, 10, 16)
 	if err != nil {
 		serverError(&w, err)

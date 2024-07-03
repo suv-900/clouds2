@@ -66,9 +66,9 @@ func GetPostsByUserId(userid uint64) []Posts {
 	return posts
 }
 
-func GetPostsMetaData(offset uint64) []Posts {
+func GetPostsMetaData(offset uint64, limit uint64) []Posts {
 	var posts []Posts
-	db.Raw(`SELECT post_id,post_title,author_name,post_likes FROM posts ORDER BY post_likes DESC LIMIT 5 OFFSET ?`, offset).Scan(&posts)
+	db.Raw(`SELECT post_id,post_title,author_name,post_likes FROM posts ORDER BY post_likes DESC LIMIT ? OFFSET ?`, limit, offset).Scan(&posts)
 	return posts
 }
 

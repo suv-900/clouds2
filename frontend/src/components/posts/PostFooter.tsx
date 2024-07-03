@@ -139,7 +139,11 @@ export default function PostFooter(props:{
         <div>
             <div className="post-likes">{likes} likes</div>
 
-            <BiSolidLike size="20"style={likebuttonstyles} className="post-like-button" onClick={()=>{
+            <BiSolidLike size="20"style={{
+            "color":liked?"#3bd139":""
+            
+        }} className="post-like-button" onClick={()=>{
+
                 if(liked){
                     removeLike();
                 }else{

@@ -13,7 +13,8 @@ export default function PostContent(props:{
                 <img src={process.env.PUBLIC_URL+'/retrobuttons/book.gif'} alt="image not found"/>  
                 <div className="post-header">
                     <h2 className="post-title">{post.title}</h2>
-                    <h5 className="post-authorname">{post.authorname}</h5> 
+                    <h5 className="post-authorname">{post.authorname}</h5>
+                    <h5 className="post-authorname">{post.createdat}</h5> 
                 </div>
                 <p className="post-content">{post.createdat}</p>
                 <p className="post-content">{post.content}</p>
