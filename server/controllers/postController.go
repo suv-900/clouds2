@@ -15,22 +15,28 @@ import (
 	"github.com/suv-900/blog/models"
 )
 
-//TODO no jwt
-/*
-->CRUD
-->getbyid
-*/
-func GetallpostsbyUser(w http.ResponseWriter, r *http.Request) {
-	var userId uint64
-	ok, p := TokenVerifier("userToken", r)
-	if ok {
-		userId = p.ID
-	} else {
-		w.WriteHeader(401)
+func GetPostsByAuthorID(w http.ResponseWriter, r *http.Request) {
+	offsetString := r.URL.Query().Get("offset")
+	limitString := r.URL.Query().Get("limit")
+	authoridString := r.URL.Query().Get("authorid")
+
+	authorid, err := strconv.ParseUint(authoridString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	offset, err := strconv.ParseUint(offsetString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	limit, err := strconv.ParseUint(limitString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
 		return
 	}
 
-	posts := models.GetPostsByUserId(userId)
+	posts := models.GetPostsByAuthorID(authorid, limit, offset)
 
 	parsedRes, err := json.Marshal(posts)
 	if err != nil {
