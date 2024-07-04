@@ -37,7 +37,9 @@ func GetPostsByAuthorID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	posts := models.GetPostsByAuthorID(authorid, limit, offset)
-
+	for i := 0; i < len(posts); i++ {
+		posts[i].Createdat_str = posts[i].Createdat.Local().Format(time.RFC822)
+	}
 	parsedRes, err := json.Marshal(posts)
 	if err != nil {
 		serverError(&w, err)
