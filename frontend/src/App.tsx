@@ -24,7 +24,7 @@ function App() {
         <Route path="/home" element={<Home/>} />
         <Route path="/register" element={<Register/>} />
 
-        <Route path="/posts/view" element={<PostViewer/>} />
+        <Route path="/post/view" element={<PostViewer/>} />
 
         <Route path="/user/:username" element={<UserInfo/>}/>
         <Route path="/error" element={<ErrorPage/>}/>

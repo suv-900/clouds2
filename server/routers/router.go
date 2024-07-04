@@ -24,6 +24,7 @@ func HandleRoutes(router *mux.Router) {
 	router.HandleFunc("/posts/getposts", controllers.GetPostsMetaData).Methods("GET")
 	router.HandleFunc("/posts/getall", controllers.GetAllPostsMetaData).Methods("GET")
 	router.HandleFunc("/posts/get-featured-posts", controllers.GetFeaturedPosts).Methods("GET")
+	router.HandleFunc("/posts/get-author-posts", controllers.GetPostsByAuthorID).Methods("GET")
 
 	router.HandleFunc("/viewpost", controllers.GetPostByID).Methods("GET")
 	router.HandleFunc("/viewpost-token", controllers.GetPostByID_WithUserPreferences).Methods("GET")
@@ -33,4 +34,6 @@ func HandleRoutes(router *mux.Router) {
 
 	router.HandleFunc("/dislikepost/{postid:[0-9]+}", controllers.DislikePost).Methods("POST")
 	router.HandleFunc("/removedislike/{postid:[0-9]+}", controllers.RemoveDislikeFromPost).Methods("POST")
+
+	router.HandleFunc("/user", controllers.GetUserInfo).Methods("GET")
 }

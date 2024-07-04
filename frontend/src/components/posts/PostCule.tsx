@@ -72,8 +72,8 @@ export default function PostCule(props:{
     }
     return(
         <div>
-        <div className="post-container">
-            <a onClick={(e)=>{gotoPost()}}  className="post-link">{post.title}</a>
+        <div onClick={()=>{gotoPost()}} className="post-container">
+            <a onClick={()=>{gotoPost()}}  className="post-link">{post.title}</a>
             <a onClick={()=>{gotoUser()}} className="author-name" >{post.authorname} author</a>
             <div className="post-likes">{likes} likes</div>
             

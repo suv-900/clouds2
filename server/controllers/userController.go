@@ -310,99 +310,37 @@ func UpdateUserPass(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 
 }
-
-// func GetUserInfo(w http.ResponseWriter, r *http.Request) {
-// 	var userid uint64
-// 	var username string
-// 	var err error
-
-// 	vars := mux.Vars(r)
-// 	useridstr := vars["userid"]
-// 	userid, err = strconv.ParseUint(useridstr, 10, 64)
-
-// 	var userInfo UserInfo
-
-// }
-
-/*
-	func AddProfilePicture(w http.ResponseWriter, r *http.Request) {
-		//TODO add the pic to a folder and add the address to the DB
-		var err error
-		var tokenExpired bool
-		var tokenInvalid bool
-		var userid uint64
-		a := make(chan int, 1)
-		go func() {
-			tokenExpired, userid, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-			a <- 1
-
-		}()
-		<-a
-		if tokenInvalid {
-			w.WriteHeader(401)
-			return
-		}
-		if tokenExpired {
-			w.WriteHeader(400)
-			return
-		}
-
-		var imageString string
-		rbody, err := io.ReadAll(r.Body)
-		if err != nil {
-			serverError(&w, err)
-			return
-		}
-		err = json.Unmarshal(rbody, &imageString)
-		if err != nil {
-			serverError(&w, err)
-			return
-		}
-
-}
-*/
-func Getass(w http.ResponseWriter, r *http.Request) {
+func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 	if username == "" {
 		w.WriteHeader(400)
 		return
 	}
 
-	var wg sync.WaitGroup
-
-	//1
-
-	channel1 := make(chan models.Users)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		channel1 <- models.GetUserDetails(username)
-		//userDetails.Username = username
-	}()
-	userDetails := <-channel1
-	fmt.Println(userDetails)
-
-	//2
-	channel2 := make(chan []models.Posts)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		channel2 <- models.GetPostsByUserId(userDetails.UserID)
-	}()
-	posts := <-channel2
-
-	wg.Wait()
-
-	userPost := models.UserAndPost{User: userDetails, Posts: posts}
-	parsedRes, err := json.Marshal(userPost)
+	u, err := models.GetUserInfo(username)
+	if u.UserID == -1 {
+		w.WriteHeader(404)
+		return
+	}
 	if err != nil {
 		serverError(&w, err)
 		return
 	}
 
-	w.WriteHeader(200)
-	w.Write(parsedRes)
+	user := models.UserInfo{
+		UserID:   u.UserID,
+		Username: u.Username,
+		About:    u.About,
+		JoinDate: u.Createdat.Local().Format(time.RFC822),
+	}
 
+	response, err := json.Marshal(user)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	w.WriteHeader(200)
+	w.Write(response)
 }
 
 // func parseReply(data any)

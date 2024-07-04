@@ -56,7 +56,7 @@ func UpdatePost(postid uint64, post Posts) error {
 func GetPostsByAuthorID(authorid uint64, limit uint64, offset uint64) []Posts {
 	var posts []Posts
 	db.Raw(`SELECT 
-	post_id,post_title,post_content,author_name,post_likes 
+	post_id,post_title,author_name,post_likes 
 	FROM posts WHERE author_id=? 
 	ORDER BY post_likes DESC LIMIT ? OFFSET ?`, authorid, limit, offset).Scan(&posts)
 	return posts

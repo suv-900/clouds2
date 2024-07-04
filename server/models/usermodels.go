@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -80,27 +81,6 @@ func CreateUser(user Users) (uint64, error) {
 	return userid, nil
 }
 
-/*
-	func AddSessionToken(s string, userid uint64) bool {
-		tx := db.Begin()
-
-		pipe1 := make(chan bool, 1)
-		go func() {
-			r := tx.Raw("INSERT INTO users(sessionToken,sessionValid) VALUES(?,?) WHERE user_id=?", s, true, userid)
-			if r.Error != nil {
-				fmt.Println(r.Error)
-				pipe1 <- false
-				return
-			}
-			pipe1 <- true
-		}()
-
-		p := <-pipe1
-		return p
-
-}
-*/
-//DONE
 func LoginUser(username string) (string, bool, uint64) {
 	var exists bool
 
@@ -147,11 +127,17 @@ func LogOut(userid uint64) bool {
 	return ok
 }
 
-// TODO
-func GetUserDetails(username string) Users {
+func GetUserInfo(username string) (Users, error) {
 	var user Users
-	db.Raw("SELECT (user_id,username,userabout) FROM users WHERE username=?", username).Scan(&user)
-	return user
+	r := db.Raw("SELECT user_id,username,about,createdat FROM users WHERE username=?", username).Scan(&user)
+	if r.RowsAffected == 0 {
+		user.UserID = -1
+		return user, errors.New("user not found")
+	}
+	if r.Error != nil {
+		return user, r.Error
+	}
+	return user, nil
 }
 
 func AddProfilePictureStoreURL(userid uint64, imageURLString string) error {

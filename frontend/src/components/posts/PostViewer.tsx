@@ -22,7 +22,7 @@ function PostViewer(){
 
     useEffect(()=>{
         const queryparams = new URLSearchParams(window.location.search);
-        const i = queryparams.get("id"); 
+        const i = queryparams.get("postid"); 
         
         if(i === null){
             navigator("/error");

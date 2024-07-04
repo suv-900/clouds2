@@ -5,8 +5,8 @@ body {
     font-weight:600;
     margin: 0;
     padding: 0;
-    background-color: #6f6c6c;
-    color: #e0e0e0;
+    background-color: #eeecec;
+    color: #ffffff;
     display: flex;
     justify-content: center;
     overflow:auto;
@@ -118,21 +118,19 @@ body {
 }
 
 .post-container {
-    width:400px;
-    background-color: #1e1e1e;
-    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.7);
-    border-radius: 10px;
-    padding: 15px;
-    height:300px;
-    margin-bottom: 15px;
+    width:500px;
+    background-color: #eeecec;
+    height:150px;
 }
-
+.post-container:hover{
+    cursor: pointer;
+}
 /* Link styles */
 .post-link {
-    font-size: 1.8em; /* Slightly smaller font size */
+    font-size: 1.2em; /* Slightly smaller font size */
     font-weight: bold;
     display: block;
-    color: #d0d0d0;
+    color: #1e1e1e;
     text-decoration: none;
     margin-bottom: 5px;
 }
@@ -141,7 +139,7 @@ body {
     color:rgb(55, 55, 255);
 }
 .author-name {
-    color: #b7b4b4;
+    color: #1e1e1e;
     font-size: 0.9em;
     margin-bottom: 5px;
     text-decoration: none;
@@ -152,7 +150,7 @@ body {
 
 /* Post title */
 .post-title {
-    font-size: 1.2em;
+    font-size: 1em;
     margin-bottom: 10px;
 }
 
@@ -167,6 +165,7 @@ body {
 
 /* Likes count */
 .post-likes{
+    color: #1e1e1e;
     margin-right: 10px;
 }
 
@@ -177,11 +176,12 @@ body {
 
 /* Separator line between posts */
 .post-separator {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #b7b7b7;
     margin-top: 20px;
     padding-top: 20px;
 }
 .like-button, .dislike-button {
+    color:black;
     display: inline-block;
     cursor: pointer;
 }
@@ -431,4 +431,34 @@ body {
     font-weight:bold;
     color: #3bd139;
 }
-
+.user-info-container {
+    width:800px;
+    padding-top: 40px;
+    height:90px;
+    margin-bottom: 15px;
+}
+.user-name{
+    font-size:2em;
+    color:#1e1e1e;
+    padding-left:10px;
+    padding-bottom:10px;
+}
+.user-about{
+    padding-left:10px;
+    color:#1e1e1e;
+    padding-bottom:10px;
+}
+.user-joindate{
+    padding-left:10px;
+    color:#1e1e1e;
+    padding-bottom:10px;
+}
+.userinfo-post-separator {
+    border-top: 1px solid #b7b7b7;
+    margin-top: 20px;
+    padding-top: 20px;
+    width:500px;
+}
+.userinfo-posts{
+    width:500px;
+}
