@@ -14,6 +14,7 @@ export default function Home(){
         window.addEventListener("scroll",handleScroll)    
         startLoading()
         getPosts()
+        setOffset(prevValue=>prevValue+5)
         
         return ()=>window.removeEventListener("scroll",handleScroll)
     },[])
@@ -26,7 +27,7 @@ export default function Home(){
 
     useEffect(()=>{
         if(!fetching) return;
-        setOffset(prevValue=>prevValue+1)
+        setOffset(prevValue=>prevValue+5)
         getPosts()
     },[fetching])
 
@@ -69,7 +70,7 @@ export default function Home(){
         }
         setTimeout(()=>{
             setFetching(false)
-            setPosts(prevValue=>postsarr)
+            setPosts(postsarr)
         },3000)
     }
 

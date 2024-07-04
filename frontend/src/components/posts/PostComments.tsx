@@ -12,13 +12,14 @@ export default function PostComments(props:{
     const[displayError,setDisplayError] = useState(false);
     const[error,setError] = useState("");
     const[fetching,setFetching] = useState(false);
-    const[offset,setOffset] = useState(1);
+    const[offset,setOffset] = useState(0);
     const[hasMore,setHasmore] = useState(true);
 
     const token = useContext(AuthContext)
     
     useEffect(()=>{
         window.addEventListener("scroll",handleScroll)    
+        setOffset(prevValue=>prevValue+5)
         
         return ()=>window.removeEventListener("scroll",handleScroll)
     },[])
@@ -31,7 +32,7 @@ export default function PostComments(props:{
 
     useEffect(()=>{
         if(!fetching) return;
-        setOffset(prevValue=>prevValue+1)
+        setOffset(prevValue=>prevValue+5)
         getComments()
     },[fetching])
 
