@@ -3,8 +3,9 @@ package models
 import "time"
 
 type Users struct {
-	UserID    uint64    `gorm:"primaryKey"`
+	UserID    int64     `gorm:"primaryKey"`
 	Username  string    `db:"username"`
+	About     string    `db:"about"`
 	Email     string    `db:"email"`
 	Password  string    `db:"password"`
 	ImageURL  string    `db:"imageURL"`
@@ -92,11 +93,8 @@ type PostAndUserPreferences struct {
 }
 
 type UserInfo struct {
-	UserID         uint64
-	Username       string
-	UserPic        string
-	UserAbout      string
-	UserStatus     string
-	Posts          Posts
-	UserJoinedDate string
+	UserID   int64
+	Username string
+	About    string
+	JoinDate string
 }
