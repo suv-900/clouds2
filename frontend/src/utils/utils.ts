@@ -37,21 +37,21 @@ function getTime(s:string):string{
     if((curryear - pastyear) > 0){
         const diff = curryear - pastyear
         if(diff === 1){
-            return `${curryear-pastyear} year ago`;
+            return `a year ago`;
         }else{
             return `${curryear-pastyear} year ago`;
         }
     }else if((currmonth - pastmonth) > 0){
         const diff = currmonth - pastmonth
         if(diff === 1){
-            return `${currmonth - pastmonth} month ago`;
+            return `a month ago`;
         }else{
             return `${currmonth - pastmonth} months ago`;
         }
     }else if((currday - pastday) > 0){
         const diff = currday - pastday
         if(diff === 1){
-            return `${currday - pastday} day ago`;
+            return `a day ago`;
         }else{
             return `${currday - pastday} days ago`;
         }
