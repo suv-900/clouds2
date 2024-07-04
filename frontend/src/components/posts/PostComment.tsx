@@ -5,6 +5,7 @@ import Comment from "../../types/Comment";
 import CommentTimeStamp from "./NewlyAddedCommentTimeStamp";
 import NewlyAddedCommentTimeStamp from "./NewlyAddedCommentTimeStamp";
 import { BiSolidDislike, BiSolidLike } from "react-icons/bi";
+import { getTime } from "../../utils/utils";
 
 export default function PostComment(props:{
    comment:Comment 
@@ -168,40 +169,3 @@ export default function PostComment(props:{
     )
 }
 
-function getTime(s:string):string{
-    const curr = new Date();
-    
-    const curryear = curr.getFullYear()
-    const currmonth = curr.getMonth()
-    const currday = curr.getDay()
-
-    const past = new Date(s.substring(0,17))
-    const pastyear = past.getFullYear()
-    const pastmonth = past.getMonth()
-    const pastday = past.getDay()
-
-    if((curryear - pastyear) > 0){
-        const diff = curryear - pastyear
-        if(diff === 1){
-            return `${curryear-pastyear} year ago`;
-        }else{
-            return `${curryear-pastyear} year ago`;
-        }
-    }else if((currmonth - pastmonth) > 0){
-        const diff = currmonth - pastmonth
-        if(diff === 1){
-            return `${currmonth - pastmonth} month ago`;
-        }else{
-            return `${currmonth - pastmonth} months ago`;
-        }
-    }else if((currday - pastday) > 0){
-        const diff = currday - pastday
-        if(diff === 1){
-            return `${currday - pastday} day ago`;
-        }else{
-            return `${currday - pastday} days ago`;
-        }
-    }else{
-        return `today`
-    }
-}
