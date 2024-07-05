@@ -172,64 +172,18 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	var userid uint64
-	var tokenExpired bool
-	var tokenInvalid bool
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, userid, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-
-	}()
-
-	if tokenExpired {
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	if tokenExpired || tokenInvalid {
 		w.WriteHeader(401)
 		return
 	}
 
-	if tokenInvalid {
-		w.WriteHeader(400)
-		return
-	}
-	/*
-		var userExists bool
-		c := make(chan int, 1)
-		go func() {
-			userExists = models.CheckUserExists(userid)
-			c <- 1
-		}()
-		<-c
-		if !userExists {
-			w.WriteHeader(400)
-			return
-		}
-	*/
-	var err error
-	err = nil
-	b := make(chan int, 1)
-	go func() {
-
-		err = models.DeleteUser(userid)
-		if err != nil {
-			b <- 1
-			return
-		}
-		//err = models.DeleteUser(userid)
-		/*
-			if err != nil {
-				b <- 1
-				return
-			}*/
-		b <- 1
-	}()
-	<-b
+	err := models.DeleteUser(userid)
 	if err != nil {
-		w.WriteHeader(500)
-		fmt.Println(err)
+		serverError(&w, err)
 		return
 	}
 	w.WriteHeader(200)
-
 }
 
 func UpdateUserPass(w http.ResponseWriter, r *http.Request) {
