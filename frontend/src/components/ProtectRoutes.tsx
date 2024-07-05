@@ -3,10 +3,10 @@ import { Navigate, Outlet } from "react-router-dom"
 
 const ProtectRoutes = ()=>{
 
-    const token = localStorage.getItem("token")
+    const loggedIn = localStorage.getItem("viewer-loggedin")
 
     return(
-        token === null?<Navigate to={"/login"}/>:<Outlet/>
+        loggedIn === "false"?<Navigate to={"/login"}/>:<Outlet/>
     )
 }
 export {ProtectRoutes}

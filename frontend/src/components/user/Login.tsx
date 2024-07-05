@@ -6,7 +6,6 @@ import { FormError } from '../errors/FormErrors';
 
 //disable button first render
 export default function Login(){
-    const navigate = useNavigate();
     //function returns the copy of the var and function to update the copy
     const[username,setUsername] = useState<string>("");
     const[password,setPassword] = useState<string>("");
@@ -14,10 +13,10 @@ export default function Login(){
     const[error,setError] = useState(false);
     const[errorMessage,setErrorMessage] = useState<string>();
     
-    // const navigator = useNavigate();
+    const navigator = useNavigate();
     useEffect(()=>{
         if(loginSuccess){
-            // navigator("/home");
+            navigator("/home");
         }
     },[loginSuccess])
 
@@ -49,9 +48,11 @@ export default function Login(){
         if(response.status === 200){
             const token = await response.json();
             localStorage.setItem("token",token);
-            // setTimeout(()=>{
-            //     navigate("/home");
-            // },2000)
+            localStorage.setItem("username",username);
+            localStorage.setItem("viewer-loggedin","true");
+            setTimeout(()=>{
+                setLoginSuccess(true)
+            },2000)
         }else if(response.status === 401){
             displayError("wrong password");
         }else if(response.status === 404){

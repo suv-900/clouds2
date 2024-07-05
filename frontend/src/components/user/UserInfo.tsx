@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import User from "../../types/User";
-import { getTime } from "../../utils/utils";
+import { getTime, getTimeForPosts } from "../../utils/utils";
 import Post from "../../types/Post";
 import Loading from "../Loading";
 import PostCule from "../posts/PostCule";
@@ -15,13 +15,17 @@ export default function UserInfo(){
     const[hasMore,setHasmore] = useState(true);
     const[fetching,setFetching] = useState(false);
     const[authorid,setAuthorid] = useState<number>()
-
+    const[loading,setLoading] = useState(true);
+    
     useEffect(()=>{
         const location = window.location
         const parts = location.pathname.split("/");
         const username = parts[parts.length - 1];
         window.addEventListener("scroll",handleScroll)
 
+        setTimeout(()=>{
+            setLoading(false)
+        },3000)
         getUserData(username)
         return ()=>window.removeEventListener("scroll",handleScroll)
 
@@ -34,7 +38,7 @@ export default function UserInfo(){
     
     useEffect(()=>{
         if(!fetching) return;
-        setOffset(prevValue=>prevValue+1)
+        setOffset(prevValue=>prevValue+5)
         getPosts()
     },[fetching])
 
@@ -42,7 +46,10 @@ export default function UserInfo(){
     useEffect(()=>{
         if(!userdetailsSuccess) return;
         if(user){
-            getPosts()
+            setTimeout(()=>{
+                getPosts()
+            },2000)
+            setOffset(prevValue=>prevValue+5)
         }
     },[userdetailsSuccess])
     
@@ -57,8 +64,7 @@ export default function UserInfo(){
                 res.About,
                 res.JoinDate
             )
-            user.createdat = getTime(user.createdat.substring(0,10))
-            console.log(user);
+            user.createdat = getTime(user.createdat)
             setUser(user);
             setAuthorid(user.userID)
             setUserDetailsSuccess(true);
@@ -95,8 +101,9 @@ export default function UserInfo(){
                     k.Post_likes,
                     false,
                     false,
-                    ""
+                    k.Createdat_str
             )
+            post.createdat = getTimeForPosts(post.createdat)
             postsarr.push(post)
             }
 
@@ -104,7 +111,6 @@ export default function UserInfo(){
                 setFetching(false);
                 setPosts(postsarr);
             },3000)
-            console.log(posts)
         }else if(response.status === 500){
 
         }
@@ -112,10 +118,12 @@ export default function UserInfo(){
     }
     return(
         <div>
-            {!notFound && user?
+            <Loading enable={loading}/>
+            {notFound && <h1>User not found</h1>}
+            {!loading && user?
             <div>
                <div className="user-info-container">
-                    <div className="user-name">{user.username}</div> 
+                    <div className="user-name">{user.username}</div>
                     <div className="userinfo-post-separator"></div> 
                 </div> 
                <div>
@@ -129,7 +137,7 @@ export default function UserInfo(){
                 </div>}
                 {!hasMore && <div className="scroll-loader-div">End.</div>} 
                 </div> 
-            </div>:<h1>User not found</h1>}
+            </div>:<></>}
         </div>
     )
 }

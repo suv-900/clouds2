@@ -65,7 +65,6 @@ export default function CreatePost(){
                 <label className="create-post-label">title</label>
                 <textarea
                     autoFocus
-                    maxLength={20} 
                     className="title-input" 
                     onChange={(e)=>{setTitle(e.target.value)}}
                     placeholder="title..."
@@ -75,7 +74,6 @@ export default function CreatePost(){
                 <label className="create-post-label">body</label>
                 <textarea
                     rows={10}
-                    maxLength={10000} 
                     className="body-input" 
                     onChange={(e)=>{setBody(e.target.value)}}
                     placeholder="Write your post..."

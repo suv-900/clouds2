@@ -6,7 +6,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #eeecec;
-    color: #ffffff;
+    color: #1e1e1e;
     display: flex;
     justify-content: center;
     overflow:auto;
@@ -51,7 +51,7 @@ body {
   content:"Loading...";
 }
 .classic-2 {
-    color:rgb(214, 209, 209);
+    color: #1e1e1e;
     font-weight: bold;
     font-family: sans-serif;
     font-size: 30px;
@@ -129,7 +129,7 @@ body {
 .post-link {
     font-size: 1.2em; /* Slightly smaller font size */
     font-weight: bold;
-    display: block;
+    display: inline-block;
     color: #1e1e1e;
     text-decoration: none;
     margin-bottom: 5px;
@@ -320,7 +320,7 @@ body {
 }
 
 .post-likes {
-    color: #e0e0e0;
+    color: #1e1e1e;
     font-weight: bold;
     text-decoration: solid;
     padding-bottom:6px;
@@ -430,6 +430,17 @@ body {
     font-size: 1em;
     font-weight:bold;
     color: #3bd139;
+}
+.i-links{
+    display:inline-block;
+    font-size: 1em;
+    font-weight:bold;
+    padding-right:5px;
+    text-decoration: underline;
+    text-align:right;
+}
+.i-links:hover{
+    cursor: pointer;
 }
 .user-info-container {
     width:800px;
