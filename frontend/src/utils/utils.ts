@@ -74,9 +74,6 @@ function getTimeForPosts(s:string):string{
     const pastyear = past.getFullYear()
     const pastmonth = past.getMonth()
     const pastday = past.getDay()
-    console.log(s);
-    console.log(past)
-    console.log(pastyear+","+pastmonth+","+pastday);
 
     if((curryear - pastyear) > 0){
         const diff = curryear - pastyear

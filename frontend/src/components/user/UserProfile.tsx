@@ -20,7 +20,6 @@ export default function UserProfile(){
     const[hasMore,setHasmore] = useState(true);
     const[authorid,setAuthorid] = useState<number>()
     const[loading,setLoading] = useState(false);
-    const[renderEditUser,setRenderEditUser] = useState(false);
     const[errorMessage,setErrorMessage] = useState("");
     const[open,setOpen] = useState(false);
     
@@ -154,7 +153,7 @@ export default function UserProfile(){
     }
     function closePopUp(){
         setTimeout(()=>{
-            // setUserAbout(userAboutInput)
+            setUserAbout(userAboutInput)
             setOpen(false)
         },1000)
     }
@@ -172,6 +171,7 @@ export default function UserProfile(){
             displayError("server error.try again later")
         }
     }
+
     return(
         <div>
             <Loading enable={loading}/>
@@ -187,6 +187,7 @@ export default function UserProfile(){
                         }}className="useredit-updateprofile">Update Profile</div>
                     <Popup 
                     modal
+                    onClose={()=>{setOpen(false)}}
                     open={open}
                     >
 
@@ -201,11 +202,10 @@ export default function UserProfile(){
                             }}
                         />
                         <button onClick={()=>{
-                            console.log(userAboutInput)
                             if(userAboutInput.length === 0){
                                 displayError("about cannot be empty")
                             }else{
-                                closePopUp()
+                                update()
                             }
                         }}>save</button>
                         <p className="useredit-errormessage">{errorMessage}</p>
