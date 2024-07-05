@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 )
 
 func CreatePost(post Posts) (uint64, error) {
@@ -19,9 +20,9 @@ func CreatePost(post Posts) (uint64, error) {
 }
 
 // deletes a post
-func DeletePost(postid uint64) error {
-
-	r := db.Exec("DELETE FROM posts WHERE postid=?", postid)
+func DeletePosts(posts []Posts) error {
+	fmt.Println("posts", posts)
+	r := db.Delete(&posts)
 	if r.Error != nil {
 		return r.Error
 	}
@@ -39,11 +40,28 @@ func GetAllPostsMetaData() []Posts {
 	db.Raw(`SELECT post_id,post_title,author_name,post_likes FROM posts ORDER BY post_likes DESC`).Scan(&posts)
 	return posts
 }
-
-func UpdatePost(postid uint64, post Posts) error {
-
+func CheckPostTitleExists(posttitle string) (bool, error) {
+	var exists bool
+	r := db.Raw("SELECT EXISTS (SELECT 1 FROM posts WHERE post_title = ?)", posttitle).Scan(&exists)
+	if r.Error != nil {
+		return exists, r.Error
+	}
+	return exists, nil
+}
+func UpdatePostTitle(postid uint64, posttitle string) error {
 	tx := db.Begin()
-	r := tx.Exec("UPDATE posts SET post_content=? post_title=? WHERE postid=?", post.Post_content, post.Post_title, postid)
+	r := tx.Raw("UPDATE posts SET post_title=? WHERE postid=?", posttitle, postid)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	} else {
+		tx.Commit()
+		return nil
+	}
+}
+func UpdatePostContent(postid uint64, postContent string) error {
+	tx := db.Begin()
+	r := tx.Raw("UPDATE posts SET post_content=? WHERE postid=?", postContent, postid)
 	if r.Error != nil {
 		tx.Rollback()
 		return r.Error
