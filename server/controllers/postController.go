@@ -94,98 +94,120 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	w.Write(parsedres)
 
 }
-
-func DeletePost(w http.ResponseWriter, r *http.Request) {
-	var postid uint64
-	var tokenExpired bool
-	var tokenInvalid bool
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, _, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-	}()
-	<-a
-
-	if tokenInvalid {
-		w.WriteHeader(400)
-		return
-	}
-	if tokenExpired {
+func UpdatePostTitle(w http.ResponseWriter, r *http.Request) {
+	tokenExpired, _, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	if tokenExpired || tokenInvalid {
 		w.WriteHeader(401)
 		return
 	}
-	pipe2 := make(chan bool, 1)
-	go func() {
-		err := models.DeletePost(postid)
-		if err != nil {
-			serverError(&w, err)
-			pipe2 <- false
-			return
-		}
-		pipe2 <- true
-	}()
-	if !<-pipe2 {
-		fmt.Println("error while deleting post")
-		return
-	}
-	fmt.Println("post deleted succesfully")
-	w.WriteHeader(200)
-}
-
-func UpdatePost(w http.ResponseWriter, r *http.Request) {
-	var postid uint64
-	var tokenExpired bool
-	var tokenInvalid bool
-	a := make(chan int, 1)
-	go func() {
-		tokenExpired, _, tokenInvalid = AuthenticateTokenAndSendUserID(r)
-		a <- 1
-	}()
-	<-a
-
-	if tokenExpired {
-		w.WriteHeader(401)
-		return
-	}
-	if tokenInvalid {
+	postidString := r.URL.Query().Get("postid")
+	if postidString == "" {
 		w.WriteHeader(400)
 		return
 	}
 
-	pipe2 := make(chan bool, 1)
-	go func() {
-
-		rbyte, err := io.ReadAll(r.Body)
-		if err != nil {
-			pipe2 <- false
-			serverError(&w, err)
-			return
-		}
-
-		var post models.Posts
-		err = json.Unmarshal(rbyte, &post)
-		if err != nil {
-			pipe2 <- false
-			serverError(&w, err)
-			return
-		}
-
-		err = models.UpdatePost(postid, post)
-		if err != nil {
-			pipe2 <- false
-			serverError(&w, err)
-			return
-		}
-		pipe2 <- true
-
-	}()
-	if !<-pipe2 {
-		fmt.Println("error while updating post")
+	postid, err := strconv.ParseUint(postidString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
 		return
 	}
+
+	rbyte, err := io.ReadAll(r.Body)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	var postTitle string
+	err = json.Unmarshal(rbyte, &postTitle)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	postTitleExists, err := models.CheckPostTitleExists(postTitle)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	if postTitleExists {
+		w.WriteHeader(409)
+		return
+	}
+
+	err = models.UpdatePostTitle(postid, postTitle)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
 	w.WriteHeader(200)
 }
 
+func UpdatePostContent(w http.ResponseWriter, r *http.Request) {
+	tokenExpired, _, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	if tokenExpired || tokenInvalid {
+		w.WriteHeader(401)
+		return
+	}
+	postidString := r.URL.Query().Get("postid")
+	if postidString == "" {
+		w.WriteHeader(400)
+		return
+	}
+
+	postid, err := strconv.ParseUint(postidString, 10, 16)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	rbyte, err := io.ReadAll(r.Body)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	var postContent string
+	err = json.Unmarshal(rbyte, &postContent)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	err = models.UpdatePostContent(postid, postContent)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	w.WriteHeader(200)
+}
+func DeletePosts(w http.ResponseWriter, r *http.Request) {
+	tokenExpired, _, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	if tokenExpired || tokenInvalid {
+		w.WriteHeader(401)
+		return
+	}
+
+	rbyte, err := io.ReadAll(r.Body)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	var posts []models.Posts
+	err = json.Unmarshal(rbyte, &posts)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	err = models.DeletePosts(posts)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	w.WriteHeader(200)
+}
 func GetPostsMetaData(w http.ResponseWriter, r *http.Request) {
 	offsetString := r.URL.Query().Get("offset")
 	limitString := r.URL.Query().Get("limit")

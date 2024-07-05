@@ -41,7 +41,7 @@ export default function Register(){
     }
     async function checkUsernameExists(username:string){
         console.log(username);
-        const response = await fetch("http://localhost:8000/checkusername",{
+        const response = await fetch("http://localhost:8000/users/checkusername",{
             body:JSON.stringify(username),
             method:"POST"
         })
@@ -85,7 +85,7 @@ export default function Register(){
         }
 
         const requestbody = JSON.stringify({username,email,password});
-        const response = await fetch("http://localhost:8000/register",{
+        const response = await fetch("http://localhost:8000/users/register",{
             body:requestbody,
             method:"POST"
         })

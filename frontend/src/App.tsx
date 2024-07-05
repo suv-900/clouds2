@@ -8,6 +8,7 @@ import CreatePost from './components/user/CreatePost';
 import ErrorPage from './components/errors/ErrorPage';
 import { ProtectRoutes } from './components/ProtectRoutes';
 import UserInfo from './components/user/UserInfo';
+import UserProfile from './components/user/UserProfile';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/v" element={<ProtectRoutes/>}>
           <Route path="/v/createpost" element={<CreatePost/>}/>
+          <Route path="/v/user-profile/:username" element={<UserProfile/>}/>
         </Route>
 
         <Route path="/" element={<h1>Main Page</h1>}/>

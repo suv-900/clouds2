@@ -42,73 +42,74 @@ func GetUsername(userid uint64) string {
 // DONE
 func CreateUser(user Users) (uint64, error) {
 	var userid uint64
-	var err error
-	pipe1 := make(chan bool, 1)
-	go func() {
-		pipe2 := make(chan bool, 1)
-		pipe3 := make(chan int, 1)
-
-		go func() {
-			tx := db.Begin()
-			sql := "INSERT INTO users (username,email,password,createdat,updatedat) VALUES(?,?,?,?,?) RETURNING user_id"
-			res := tx.Raw(sql, user.Username, user.Email, user.Password, user.Createdat, user.Updatedat).Scan(&userid)
-			if res.Error != nil {
-				tx.Rollback()
-				pipe2 <- false
-				err = res.Error
-				return
-			}
-			tx.Commit()
-			err = nil
-			pipe2 <- true
-		}()
-
-		if !<-pipe2 {
-			return
-		}
-
-		go func() {
-			db.Raw("UPDATE active FROM users WHERE user_id=?", true)
-			pipe3 <- 1
-		}()
-		<-pipe3
-
-		pipe1 <- true
-	}()
-	if !<-pipe1 {
-		return 0, err
+	tx := db.Begin()
+	sql := "INSERT INTO users (username,email,password) VALUES(?,?,?,?,?) RETURNING user_id"
+	r := tx.Raw(sql, user.Username, user.Email, user.Password).Scan(&userid)
+	if r.Error != nil {
+		tx.Rollback()
+		return userid, r.Error
+	} else {
+		tx.Commit()
 	}
 	return userid, nil
 }
 
 func LoginUser(username string) (string, bool, uint64) {
 	var exists bool
-
 	db.Raw("SELECT EXISTS (SELECT 1 FROM users WHERE username=?)", username).Scan(&exists)
 	if exists {
 		var res Passanduserid
 		db.Raw("SELECT user_id,password FROM users WHERE username= ?", username).Scan(&res)
-
-		db.Exec("UPDATE users SET active= ? WHERE user_id= ?", true, res.User_id)
-
 		return res.Password, true, res.User_id
 	}
 	return "", false, 0
 }
 
-// checks if user is logged in
+func UpdateUserAbout(about string, userid uint64) error {
+	r := db.Raw("UPDATE users SET about = ? WHERE user_id = ?", about, userid)
+	if r.Error != nil {
+		return r.Error
+	}
+	return nil
+}
+func GetUserInfo(username string) (Users, error) {
+	var user Users
+	r := db.Raw("SELECT user_id,username,about,createdat FROM users WHERE username=?", username).Scan(&user)
+	if r.RowsAffected == 0 {
+		user.UserID = -1
+		return user, errors.New("user not found")
+	}
+	if r.Error != nil {
+		return user, r.Error
+	}
+	return user, nil
+}
+func DeleteUser(userid uint64) error {
+	r := db.Raw("DELETE FROM comments WHERE user_id=?", userid)
+	if r.Error != nil {
+		return r.Error
+	}
+	r = db.Raw("DELETE FROM posts WHERE author_id=?", userid)
+	if r.Error != nil {
+		return r.Error
+	}
+
+	r = db.Raw("DELETE FROM users WHERE user_id=?", userid)
+	if r.Error != nil {
+		return r.Error
+	}
+	return nil
+}
 func CheckUserLoggedIn(userid uint64) bool {
-	p := make(chan bool, 1)
-	go func() {
-		var active bool
-		db.Raw("SELECT active FROM users WHERE user_id=?", userid).Scan(&active)
-		p <- active
-	}()
-	res := <-p
-	return res
+	var active bool
+	db.Raw("SELECT active FROM users WHERE user_id=?", userid).Scan(&active)
+	return active
+}
+func AddProfilePictureStoreURL(userid uint64, imageURLString string) error {
+	r := db.Exec("UPDATE users SET profilePicture=? WHERE user_id=?", imageURLString, userid)
+	return r.Error
 }
 
-// DONE
 func LogOut(userid uint64) bool {
 	p := make(chan int, 1)
 	var ok bool
@@ -126,102 +127,6 @@ func LogOut(userid uint64) bool {
 	<-p
 	return ok
 }
-
-func GetUserInfo(username string) (Users, error) {
-	var user Users
-	r := db.Raw("SELECT user_id,username,about,createdat FROM users WHERE username=?", username).Scan(&user)
-	if r.RowsAffected == 0 {
-		user.UserID = -1
-		return user, errors.New("user not found")
-	}
-	if r.Error != nil {
-		return user, r.Error
-	}
-	return user, nil
-}
-
-func AddProfilePictureStoreURL(userid uint64, imageURLString string) error {
-	r := db.Exec("UPDATE users SET profilePicture=? WHERE user_id=?", imageURLString, userid)
-	return r.Error
-}
-
-// DONE
-func DeleteUser(userid uint64) error {
-	var err error
-	err = nil
-	//comments can be deleted or no
-	a := make(chan int, 1)
-	go func() {
-		r := db.Exec("DELETE FROM comments WHERE user_id=?", userid)
-		if r.Error != nil {
-			fmt.Println(r.Error)
-			err = r.Error
-			a <- 1
-			return
-		}
-		a <- 1
-	}()
-	<-a
-	if err != nil {
-		return err
-	}
-
-	b := make(chan int, 1)
-	go func() {
-		r := db.Exec("DELETE FROM posts WHERE author_id=?", userid)
-		if r.Error != nil {
-			fmt.Println(r.Error)
-			err = r.Error
-			b <- 1
-			return
-		}
-		b <- 1
-	}()
-	<-b
-	if err != nil {
-		return err
-	}
-
-	c := make(chan int, 1)
-	go func() {
-		r := db.Exec("DELETE FROM users WHERE user_id=?", userid)
-		if r.Error != nil {
-			fmt.Println(r.Error)
-			err = r.Error
-			c <- 1
-			return
-		}
-		c <- 1
-	}()
-	<-c
-	if err != nil {
-		return err
-	}
-
-	return err
-}
-
-func DeleteUser2(userid uint64) {
-	a := make(chan int, 1)
-	go func() {
-		db.Exec("DELETE FROM comments WHERE user_id=?", userid)
-		a <- 1
-	}()
-	<-a
-	b := make(chan int, 1)
-	go func() {
-		db.Exec("DELETE FROM posts WHERE author_id=?", userid)
-		b <- 1
-	}()
-	<-b
-	c := make(chan int, 1)
-	go func() {
-		db.Exec("DELETE FROM users WHERE user_id=?", userid)
-		c <- 1
-	}()
-	<-c
-}
-
 func UpdatePass(pass string, userid uint64) error {
 	tx := db.Begin()
 	r := tx.Exec("UPDATE users SET password=? WHERE userid=?", pass, userid)
@@ -235,28 +140,11 @@ func UpdatePass(pass string, userid uint64) error {
 	}
 }
 
-/*
-func CheckCategory(categoryName string) (bool, uint) {
-	var categoryId uint
-	db.Exec("SELECT (category_id) FROM category WHERE category_name=?", categoryName).Scan(&category)
-	if categoryId == nil {
-		return false, 0
-	}
-	return true, categoryId
-}*/
-
-// creates a post
-func CheckUserExists(userid uint64) bool {
-	a := make(chan int, 1)
+func CheckUserExists(userid uint64) (bool, error) {
 	var exists bool
-	go func() {
-		db.Raw("SELECT EXISTS (SELECT 1 FROM users WHERE user_id=?)", userid).Scan(&exists)
-		a <- 1
-	}()
-	<-a
-	return exists
-}
-
-// image
-func AddProfilePic(userid uint64) {
+	r := db.Raw("SELECT EXISTS (SELECT 1 FROM users WHERE user_id=?)", userid).Scan(&exists)
+	if r.Error != nil {
+		return exists, r.Error
+	}
+	return exists, nil
 }

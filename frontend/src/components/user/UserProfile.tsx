@@ -1,42 +1,64 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import User from "../../types/User";
-import { getTime, getTimeForPosts } from "../../utils/utils";
 import Post from "../../types/Post";
+import { getTime, getTimeForPosts } from "../../utils/utils";
 import Loading from "../Loading";
 import PostCule from "../posts/PostCule";
+import EditUser from "./EditUser";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 
-export default function UserInfo(){
+export default function UserProfile(){
     const[username,setUsername] = useState("");
+    const[token,setToken] = useState("") 
+    const[fetching,setFetching] = useState(false);
     const[notFound,setNotFound] = useState(false);
     const[user,setUser] = useState<User>();
     const[posts,setPosts] = useState<Post[]>([]); 
     const[userdetailsSuccess,setUserDetailsSuccess] = useState(false);
     const[offset,setOffset] = useState(0);
     const[hasMore,setHasmore] = useState(true);
-    const[fetching,setFetching] = useState(false);
     const[authorid,setAuthorid] = useState<number>()
-    const[loading,setLoading] = useState(true);
-    
+    const[loading,setLoading] = useState(false);
+    const[renderEditUser,setRenderEditUser] = useState(false);
+    const[userAbout,setUserAbout] = useState("");
+
+    const navigator = useNavigate()
     useEffect(()=>{
+        setLoading(true)
         const location = window.location
-        const parts = location.pathname.split("/");
+        const parts = location.pathname.split("/")
         const username = parts[parts.length - 1];
-        setUsername(username)
-        window.addEventListener("scroll",handleScroll)
 
-        setTimeout(()=>{
-            setLoading(false)
-        },3000)
+        if(username.length === 0){
+            navigator("/error");
+        }else{
+            setUsername(username)
+            const userLoggedIn = localStorage.getItem("viewer-loggedin");
+            if(userLoggedIn != null && userLoggedIn === "true"){
+                const token = localStorage.getItem("token");
+                if(token != null){
+                    setToken(token)
+                }else{
+                    navigator("/login")
+                    return;
+                }
+            }else{
+                navigator("/login")
+                return;
+            }
+        }
         getUserData(username)
+        window.addEventListener("scroll",handleScroll)
         return ()=>window.removeEventListener("scroll",handleScroll)
-
     },[])
     function handleScroll(){
         if(window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && !fetching){
             setFetching(true);
         }
     }
-    
+
     useEffect(()=>{
         if(!fetching) return;
         setOffset(prevValue=>prevValue+5)
@@ -54,6 +76,7 @@ export default function UserInfo(){
         }
     },[userdetailsSuccess])
     
+
     async function getUserData(uname:string){
         const response = await fetch(`http://localhost:8000/user?username=${uname}`)
        
@@ -68,7 +91,9 @@ export default function UserInfo(){
             user.createdat = getTime(user.createdat)
             setUser(user);
             setAuthorid(user.userID)
+            setUserAbout(user.about)
             setUserDetailsSuccess(true);
+            setLoading(false)
         }else if(response.status === 404){
             setNotFound(true);
         }
@@ -117,14 +142,36 @@ export default function UserInfo(){
         }
         
     }
+
+    function renderEditUserComponent(){
+        console.log("sa")
+        setTimeout(()=>{
+            setRenderEditUser(true); 
+        },300)
+    }
     return(
         <div>
             <Loading enable={loading}/>
+            
             {notFound && <h1>User not found</h1>}
             {!loading && user?
             <div>
                <div className="user-info-container">
                     <div className="user-name">{user.username}</div>
+                    <Popup 
+                    trigger={
+                    <div className="useredit-updateprofile">Update Profile</div>
+                    }
+                    modal
+
+                    >
+                        <EditUser 
+                        enable={renderEditUser}
+                        userAbout={userAbout}
+                        token={token}
+                        username={username}
+                        />
+                    </Popup>
                     <div className="userinfo-post-separator"></div> 
                 </div> 
                <div>

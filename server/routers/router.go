@@ -6,9 +6,14 @@ import (
 )
 
 func HandleRoutes(router *mux.Router) {
-	router.HandleFunc("/register", controllers.CreateUser).Methods("POST")
-	router.HandleFunc("/login", controllers.LoginUser).Methods("POST")
-	router.HandleFunc("/checkusername", controllers.SearchUsername).Methods("POST")
+	router.HandleFunc("/users/register", controllers.CreateUser).Methods("POST")
+	router.HandleFunc("/users/deleteuser", controllers.DeleteUser).Methods("DELETE")
+	router.HandleFunc("/users/login", controllers.LoginUser).Methods("POST")
+	router.HandleFunc("/users/checkusername", controllers.SearchUsername).Methods("POST")
+	router.HandleFunc("/users/update-about", controllers.UpdateUserAbout).Methods("PUT")
+
+	router.HandleFunc("/user", controllers.GetUserInfo).Methods("GET")
+
 	//	router.HandleFunc("/profile", controllers.CreatePost).Methods("POST")
 	router.HandleFunc("/serverstatus", controllers.CheckServerHealth).Methods("GET")
 	router.HandleFunc("/createpost", controllers.CreatePost).Methods("POST")
@@ -25,6 +30,9 @@ func HandleRoutes(router *mux.Router) {
 	router.HandleFunc("/posts/getall", controllers.GetAllPostsMetaData).Methods("GET")
 	router.HandleFunc("/posts/get-featured-posts", controllers.GetFeaturedPosts).Methods("GET")
 	router.HandleFunc("/posts/get-author-posts", controllers.GetPostsByAuthorID).Methods("GET")
+	router.HandleFunc("/posts/delete-posts", controllers.DeletePosts).Methods("DELETE")
+	router.HandleFunc("/posts/update-post-title", controllers.UpdatePostTitle).Methods("PUT")
+	router.HandleFunc("/posts/update-post-content", controllers.UpdatePostContent).Methods("PUT")
 
 	router.HandleFunc("/viewpost", controllers.GetPostByID).Methods("GET")
 	router.HandleFunc("/viewpost-token", controllers.GetPostByID_WithUserPreferences).Methods("GET")
@@ -35,5 +43,4 @@ func HandleRoutes(router *mux.Router) {
 	router.HandleFunc("/dislikepost/{postid:[0-9]+}", controllers.DislikePost).Methods("POST")
 	router.HandleFunc("/removedislike/{postid:[0-9]+}", controllers.RemoveDislikeFromPost).Methods("POST")
 
-	router.HandleFunc("/user", controllers.GetUserInfo).Methods("GET")
 }

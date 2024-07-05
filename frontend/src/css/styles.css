@@ -473,3 +473,25 @@ body {
 .userinfo-posts{
     width:500px;
 }
+
+.useredit-updateprofile{
+    text-decoration: underline;
+}
+.useredit-updateprofile:hover{
+    cursor: pointer;
+}
+
+.useredit-content {
+    background: white;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+.useredit-abouttextarea{
+    border: 1px solid #ccc; /* Light grey border */
+    border-radius: 5px; /* Rounded corners */
+    box-sizing: border-box;
+    resize:none;
+    display:block
+}
+

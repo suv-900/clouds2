@@ -104,7 +104,7 @@ export default function Home(){
         setLoading(true);
         setTimeout(()=>{
             setLoading(false);
-            navigator(`/user/${username}`)
+            navigator(`/v/user-profile/${username}`)
         },2000)
     }
     function logOut(){

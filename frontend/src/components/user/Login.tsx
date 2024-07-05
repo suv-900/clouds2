@@ -40,7 +40,7 @@ export default function Login(){
         const requestBody= {username,password}
         const body = JSON.stringify(requestBody);
 
-        const response = await fetch("http://localhost:8000/login",{
+        const response = await fetch("http://localhost:8000/users/login",{
             body:body,
             method:"POST"
         })

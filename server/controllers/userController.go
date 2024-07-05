@@ -170,7 +170,33 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	w.Write(ts)
 }
+func UpdateUserAbout(w http.ResponseWriter, r *http.Request) {
+	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
+	if tokenExpired || tokenInvalid {
+		w.WriteHeader(401)
+		return
+	}
 
+	rbyte, err := io.ReadAll(r.Body)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+	var userAbout string
+	err = json.Unmarshal(rbyte, &userAbout)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	err = models.UpdateUserAbout(userAbout, userid)
+	if err != nil {
+		serverError(&w, err)
+		return
+	}
+
+	w.WriteHeader(200)
+}
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	tokenExpired, userid, tokenInvalid := AuthenticateTokenAndSendUserID(r)
 	if tokenExpired || tokenInvalid {
