@@ -5,7 +5,6 @@ import Post from "../../types/Post";
 import { getTime, getTimeForPosts } from "../../utils/utils";
 import Loading from "../Loading";
 import PostCule from "../posts/PostCule";
-import EditUser from "./EditUser";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 
@@ -22,7 +21,11 @@ export default function UserProfile(){
     const[authorid,setAuthorid] = useState<number>()
     const[loading,setLoading] = useState(false);
     const[renderEditUser,setRenderEditUser] = useState(false);
+    const[errorMessage,setErrorMessage] = useState("");
+    const[open,setOpen] = useState(false);
+    
     const[userAbout,setUserAbout] = useState("");
+    const[userAboutInput,setUserAboutInput] = useState("");
 
     const navigator = useNavigate()
     useEffect(()=>{
@@ -142,12 +145,32 @@ export default function UserProfile(){
         }
         
     }
-
-    function renderEditUserComponent(){
-        console.log("sa")
+    
+    function displayError(s:string){
+        setErrorMessage(s);
         setTimeout(()=>{
-            setRenderEditUser(true); 
-        },300)
+            setErrorMessage("");
+        },2000)
+    }
+    function closePopUp(){
+        setTimeout(()=>{
+            // setUserAbout(userAboutInput)
+            setOpen(false)
+        },1000)
+    }
+    async function update(){
+        const response = await fetch(`http://localhost:8000/users/update-about`,{
+            method:"PUT",
+            headers:{"Authorization":token},
+            body:userAboutInput
+        })
+        if(response.status === 200){
+            closePopUp()
+        }else if(response.status === 400){
+            displayError("please login")
+        }else if(response.status === 500){
+            displayError("server error.try again later")
+        }
     }
     return(
         <div>
@@ -158,19 +181,36 @@ export default function UserProfile(){
             <div>
                <div className="user-info-container">
                     <div className="user-name">{user.username}</div>
+                    <div onClick={()=>{
+                        setUserAboutInput("")
+                        setOpen(true)
+                        }}className="useredit-updateprofile">Update Profile</div>
                     <Popup 
-                    trigger={
-                    <div className="useredit-updateprofile">Update Profile</div>
-                    }
                     modal
-
+                    open={open}
                     >
-                        <EditUser 
-                        enable={renderEditUser}
-                        userAbout={userAbout}
-                        token={token}
-                        username={username}
+
+                    <div> 
+                        <div>Profile Information</div>
+                        <h2>{username}</h2>
+                        <label>About</label>
+                        <textarea
+                        className="useredit-abouttextarea" 
+                        onChange={(e)=>{
+                                setUserAboutInput(e.target.value)
+                            }}
                         />
+                        <button onClick={()=>{
+                            console.log(userAboutInput)
+                            if(userAboutInput.length === 0){
+                                displayError("about cannot be empty")
+                            }else{
+                                closePopUp()
+                            }
+                        }}>save</button>
+                        <p className="useredit-errormessage">{errorMessage}</p>
+                    </div>    
+
                     </Popup>
                     <div className="userinfo-post-separator"></div> 
                 </div> 
