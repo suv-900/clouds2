@@ -59,4 +59,41 @@ function getTime(s:string):string{
         return `today`
     }
 }
-export {checkPassword,checkEmail,getTime};
+const months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+function getTimeForPosts(s:string):string{
+    const curr = new Date();
+    
+    const curryear = curr.getFullYear()
+    const currmonth = curr.getMonth()
+    const currday = curr.getDay()
+
+    const past = new Date(s.substring(0,10))
+    const pastyear = past.getFullYear()
+    const pastmonth = past.getMonth()
+    const pastday = past.getDay()
+    console.log(s);
+    console.log(past)
+    console.log(pastyear+","+pastmonth+","+pastday);
+
+    if((curryear - pastyear) > 0){
+        const diff = curryear - pastyear
+        return months[(currmonth - pastmonth)-1]+","+pastyear.toString() 
+    }else if((currmonth - pastmonth) > 0){
+        const diff = currmonth - pastmonth 
+        return months[diff - 1]+","+pastday.toString() 
+    }else if((currday - pastday) > 0){
+        const diff = currday - pastday
+        if(diff === 1){
+            return `a day ago`;
+        }else{
+            const diff = currmonth - pastmonth 
+            return months[diff - 1]+","+pastday.toString() 
+        }
+    }else{
+        return `today`
+    }
+}
+export {checkPassword,checkEmail,getTime,getTimeForPosts};
