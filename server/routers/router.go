@@ -1,8 +1,9 @@
 package routers
 
 import (
+	"cloud/controllers"
+
 	"github.com/gorilla/mux"
-	"github.com/suv-900/blog/controllers"
 )
 
 func HandleRoutes(router *mux.Router) {

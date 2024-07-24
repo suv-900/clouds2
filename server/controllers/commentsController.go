@@ -10,9 +10,10 @@ import (
 
 	"net/http"
 
+	"cloud/models"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/mux"
-	"github.com/suv-900/blog/models"
 )
 
 func AddComment(w http.ResponseWriter, r *http.Request) {

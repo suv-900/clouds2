@@ -6,8 +6,6 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	//"gorm.io/plugin/prometheus"
-	//	_ "github.com/lib/pq"
 )
 
 //root:Core@123@/blogweb?

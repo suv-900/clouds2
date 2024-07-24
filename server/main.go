@@ -5,10 +5,11 @@ import (
 	"log"
 	"net/http"
 
+	"cloud/models"
+	"cloud/routers"
+
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"github.com/suv-900/blog/models"
-	"github.com/suv-900/blog/routers"
 )
 
 // implement cors
@@ -25,7 +26,7 @@ func main() {
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   []string{"http://localhost:5173"},
 	})
 
 	handler := c.Handler(router)
