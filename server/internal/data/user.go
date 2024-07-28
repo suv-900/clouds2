@@ -14,7 +14,7 @@ import (
 type User struct {
 	ID uint `gorm:"primaryKey"`
 
-	Username      string
+	Username      string `gorm:"<-false"`
 	Active        bool
 	Email         string
 	Password      string
@@ -112,6 +112,24 @@ func (u UserClient) GetUser(c context.Context, username string) (User, error) {
 		return user, ErrInternalServerError
 	}
 	return user, nil
+}
+
+func (u UserClient) UpdateUser(c context.Context, user *User) error {
+	cx, cancel := context.WithTimeout(c, context_timeout)
+	defer cancel()
+
+	r := u.db.WithContext(cx).Updates(user)
+
+	if r.Error != nil {
+		if r.Error == gorm.ErrRecordNotFound {
+			return ErrRecordNotFound
+		}
+		log.Error(r.Error)
+		return ErrInternalServerError
+	}
+
+	return nil
+
 }
 func (u UserClient) UpdateProfilePictureURL(c context.Context, userID uint64, iurl string) error {
 	cx, cancel := context.WithTimeout(c, context_timeout)
