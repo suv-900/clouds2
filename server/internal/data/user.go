@@ -1,4 +1,4 @@
-package models
+package data
 
 import (
 	"context"
@@ -30,14 +30,8 @@ type UserClient struct {
 	db *gorm.DB
 }
 
-var (
-	ErrConflict            = errors.New("already exists")
-	ErrRecordNotFound      = errors.New("not found")
-	ErrInternalServerError = errors.New("internal server error")
-)
-
 func (u UserClient) CheckUserExists(c context.Context, username string) (bool, error) {
-	cx, cancel := context.WithTimeout(c, 5*time.Second)
+	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
 	sql := `select exists (select 1 from users where username = ?) as exists`
@@ -52,7 +46,7 @@ func (u UserClient) CheckUserExists(c context.Context, username string) (bool, e
 }
 
 func (u UserClient) AddUser(c context.Context, user *User) error {
-	cx, cancel := context.WithTimeout(c, 5*time.Second)
+	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
 	t := u.db.WithContext(cx).Create(user)
@@ -67,7 +61,7 @@ func (u UserClient) AddUser(c context.Context, user *User) error {
 }
 
 func (u UserClient) GetUsername(c context.Context, userid uint64) (string, error) {
-	cx, cancel := context.WithTimeout(c, 5*time.Second)
+	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
 	var username string
@@ -85,7 +79,7 @@ func (u UserClient) GetUsername(c context.Context, userid uint64) (string, error
 }
 
 func (u UserClient) GetUserPassword(c context.Context, username string) (string, error) {
-	cx, cancel := context.WithTimeout(c, 5*time.Second)
+	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
 	var dbpassword string
@@ -103,7 +97,7 @@ func (u UserClient) GetUserPassword(c context.Context, username string) (string,
 }
 
 func (u UserClient) GetUser(c context.Context, username string) (User, error) {
-	cx, cancel := context.WithTimeout(c, 5*time.Second)
+	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
 	var user User
@@ -119,11 +113,11 @@ func (u UserClient) GetUser(c context.Context, username string) (User, error) {
 	}
 	return user, nil
 }
-func (u UserClient) UpdateProfilePictureURL(c context.Context, user *User, iurl string) error {
-	cx, cancel := context.WithTimeout(c, 5*time.Second)
+func (u UserClient) UpdateProfilePictureURL(c context.Context, userID uint64, iurl string) error {
+	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
-	t := u.db.WithContext(cx).Model(user).Update("ProfilePicURL", iurl)
+	t := u.db.WithContext(cx).Where("user_id", userID).Update("ProfilePicURL", iurl)
 
 	if t.Error != nil {
 		if errors.Is(t.Error, gorm.ErrRecordNotFound) {
@@ -137,7 +131,7 @@ func (u UserClient) UpdateProfilePictureURL(c context.Context, user *User, iurl 
 }
 
 func (u UserClient) UpdateUserPassword(c context.Context, password string, user *User) error {
-	cx, cancel := context.WithTimeout(c, 5*time.Second)
+	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
 	t := u.db.WithContext(cx).Model(user).Update("password", password)
@@ -153,7 +147,7 @@ func (u UserClient) UpdateUserPassword(c context.Context, password string, user 
 }
 
 func (u UserClient) DeleteUser(c context.Context, userid uint64) error {
-	cx, cancel := context.WithTimeout(c, 5*time.Second)
+	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
 	t := u.db.WithContext(cx).Delete(&User{}, userid)
