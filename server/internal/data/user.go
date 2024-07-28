@@ -71,7 +71,7 @@ func (u UserClient) GetUsername(c context.Context, userid uint64) (string, error
 	defer cancel()
 
 	var username string
-	sql := `SELECT username FROM users WHERE user_id = ?`
+	sql := `select username from users where user_id = ?`
 	t := u.db.WithContext(cx).Raw(sql, userid).Scan(&username)
 
 	if t.Error != nil {
@@ -119,19 +119,28 @@ func (u UserClient) GetUser(c context.Context, username string) (User, error) {
 	}
 	return user, nil
 }
-
-func UpdateUserAbout(about string, userid uint64) error {
-	r := db.Raw("UPDATE users SET about = ? WHERE user_id = ?", about, userid)
-	if r.Error != nil {
-		return r.Error
-	}
-	return nil
-}
-func (u UserClient) DeleteUser(c context.Context, userid uint64) error {
+func (u UserClient) UpdateProfilePictureURL(c context.Context, user *User, iurl string) error {
 	cx, cancel := context.WithTimeout(c, 5*time.Second)
 	defer cancel()
 
-	t := u.db.WithContext(cx).Delete(&User{}, userid)
+	t := u.db.WithContext(cx).Model(user).Update("ProfilePicURL", iurl)
+
+	if t.Error != nil {
+		if errors.Is(t.Error, gorm.ErrRecordNotFound) {
+			return ErrRecordNotFound
+		}
+
+		return ErrInternalServerError
+	}
+
+	return nil
+}
+
+func (u UserClient) UpdateUserPassword(c context.Context, password string, user *User) error {
+	cx, cancel := context.WithTimeout(c, 5*time.Second)
+	defer cancel()
+
+	t := u.db.WithContext(cx).Model(user).Update("password", password)
 
 	if t.Error != nil {
 		if errors.Is(t.Error, gorm.ErrRecordNotFound) {
@@ -143,21 +152,11 @@ func (u UserClient) DeleteUser(c context.Context, userid uint64) error {
 	return nil
 }
 
-func CheckUserLoggedIn(userid uint64) bool {
-	var active bool
-	db.Raw("SELECT active FROM users WHERE user_id=?", userid).Scan(&active)
-	return active
-}
-func AddProfilePictureStoreURL(userid uint64, imageURLString string) error {
-	r := db.Exec("UPDATE users SET profilePicture=? WHERE user_id=?", imageURLString, userid)
-	return r.Error
-}
-
-func (u UserClient) UpdateUserPassword(c context.Context, password string, user *User) error {
+func (u UserClient) DeleteUser(c context.Context, userid uint64) error {
 	cx, cancel := context.WithTimeout(c, 5*time.Second)
 	defer cancel()
 
-	t := u.db.WithContext(cx).Model(user).Update("password", password)
+	t := u.db.WithContext(cx).Delete(&User{}, userid)
 
 	if t.Error != nil {
 		if errors.Is(t.Error, gorm.ErrRecordNotFound) {
