@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
 var (
@@ -17,12 +20,17 @@ const context_timeout = 5 * time.Second
 type Models struct {
 	Users interface {
 		AddUser(cx context.Context, user *User) error
-		GetUser(cx context.Context, userID uint64) (User, error)
+		GetUser(cx context.Context, username string) (User, error)
 		UpdateUser(cx context.Context, user *User) error
 		DeleteUser(cx context.Context, userID uint64) error
 
 		CheckUserExists(cx context.Context, username string) (bool, error)
 		GetUserPassword(cx context.Context, username string) (string, error)
-		UpdateProfilePictureURL(cx context.Context, userID uint64, iurl string) error
+	}
+}
+
+func GetModels(gd *gorm.DB, mc *mongo.Client) Models {
+	return Models{
+		Users: UserClient{db: gd},
 	}
 }
