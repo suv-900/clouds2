@@ -31,7 +31,7 @@ type Models struct {
 		GetUserPassword(cx context.Context, username string) (string, error)
 	}
 	Posts interface {
-		AddPost(cx context.Context, post *Post) (int, error)
+		AddPost(cx context.Context, post *Post) (int64, error)
 		GetPost(cx context.Context, postID primitive.ObjectID) (Post, error)
 		UpdatePost(cx context.Context, update bson.D, postID primitive.ObjectID) error
 		DeletePost(cx context.Context, postID primitive.ObjectID) error
@@ -41,11 +41,20 @@ type Models struct {
 		IncrementLike(cx context.Context, postID primitive.ObjectID) error
 		DecrementLike(cx context.Context, postID primitive.ObjectID) error
 	}
+	Comments interface {
+		AddComment(cx context.Context, comment *Comment) (int64, error)
+		UpdateComment(cx context.Context, update bson.D, commentID primitive.ObjectID) error
+		DeleteComment(cx context.Context, commentID primitive.ObjectID) error
+		IncrementLike(cx context.Context, commentID primitive.ObjectID) error
+		DecrementLike(cx context.Context, commentID primitive.ObjectID) error
+	}
 }
 
+// remove db
 func GetModels(gd *gorm.DB, mc *mongo.Client) Models {
 	return Models{
-		Users: UserClient{db: gd},
-		Posts: PostClient{client: mc},
+		Users:    UserClient{db: gd},
+		Posts:    PostClient{client: mc, db: mc.Database("cross")},
+		Comments: CommentClient{client: mc, db: mc.Database("cross")},
 	}
 }
