@@ -25,11 +25,11 @@ type PostClient struct {
 	db     *mongo.Database
 }
 
-func (p PostClient) AddPost(c context.Context, post *Post) (int, error) {
+func (p PostClient) AddPost(c context.Context, post *Post) (int64, error) {
 	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
-	var postID int
+	var postID int64
 
 	res, err := p.db.Collection("posts").InsertOne(cx, post)
 	if err != nil {
@@ -37,7 +37,7 @@ func (p PostClient) AddPost(c context.Context, post *Post) (int, error) {
 		return postID, ErrInternalServerError
 	}
 
-	postID, ok := res.InsertedID.(int)
+	postID, ok := res.InsertedID.(int64)
 	if !ok {
 		s := fmt.Sprintf("cannot convert %s interface{} type to int", res.InsertedID)
 		log.Error(s)
