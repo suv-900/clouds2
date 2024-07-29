@@ -10,7 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// postgres://core:12345678@localhost:5432/cloud
 type User struct {
 	ID uint `gorm:"primaryKey"`
 
@@ -118,7 +117,7 @@ func (u UserClient) UpdateUser(c context.Context, user *User) error {
 	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
 
-	r := u.db.WithContext(cx).Updates(user)
+	r := u.db.WithContext(cx).Model(&User{ID: user.ID}).Updates(user)
 
 	if r.Error != nil {
 		if r.Error == gorm.ErrRecordNotFound {
@@ -131,6 +130,23 @@ func (u UserClient) UpdateUser(c context.Context, user *User) error {
 	return nil
 
 }
+
+func (u UserClient) DeleteUser(c context.Context, userid uint64) error {
+	cx, cancel := context.WithTimeout(c, context_timeout)
+	defer cancel()
+
+	t := u.db.WithContext(cx).Delete(&User{}, userid)
+
+	if t.Error != nil {
+		if errors.Is(t.Error, gorm.ErrRecordNotFound) {
+			return ErrRecordNotFound
+		}
+		return ErrInternalServerError
+	}
+
+	return nil
+}
+
 func (u UserClient) UpdateProfilePictureURL(c context.Context, userID uint64, iurl string) error {
 	cx, cancel := context.WithTimeout(c, context_timeout)
 	defer cancel()
@@ -153,22 +169,6 @@ func (u UserClient) UpdateUserPassword(c context.Context, password string, user 
 	defer cancel()
 
 	t := u.db.WithContext(cx).Model(user).Update("password", password)
-
-	if t.Error != nil {
-		if errors.Is(t.Error, gorm.ErrRecordNotFound) {
-			return ErrRecordNotFound
-		}
-		return ErrInternalServerError
-	}
-
-	return nil
-}
-
-func (u UserClient) DeleteUser(c context.Context, userid uint64) error {
-	cx, cancel := context.WithTimeout(c, context_timeout)
-	defer cancel()
-
-	t := u.db.WithContext(cx).Delete(&User{}, userid)
 
 	if t.Error != nil {
 		if errors.Is(t.Error, gorm.ErrRecordNotFound) {
