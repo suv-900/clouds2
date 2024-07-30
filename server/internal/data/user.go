@@ -6,14 +6,13 @@ import (
 	"time"
 
 	"gorm.io/datatypes"
-
 	"gorm.io/gorm"
 )
 
 type User struct {
 	ID uint `gorm:"primaryKey"`
 
-	Username      string `gorm:"<-false"`
+	Username      string `gorm:"index;<-false;unique"`
 	Active        bool
 	Email         string
 	Password      string
