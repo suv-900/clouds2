@@ -22,7 +22,6 @@ type Comment struct {
 
 type CommentClient struct {
 	client *mongo.Client
-	db     *mongo.Database
 }
 
 func (cc CommentClient) AddComment(c context.Context, comment *Comment) (int64, error) {
@@ -30,7 +29,10 @@ func (cc CommentClient) AddComment(c context.Context, comment *Comment) (int64, 
 	defer cancel()
 
 	var commentID int64
-	res, err := cc.db.Collection("comments").InsertOne(cx, comment)
+
+	col := cc.client.Database("cross").Collection("comments")
+
+	res, err := col.InsertOne(cx, comment)
 	if err != nil {
 		log.Error(err)
 		return commentID, ErrInternalServerError
@@ -51,7 +53,9 @@ func (cc CommentClient) DeleteComment(c context.Context, commentID primitive.Obj
 	defer cancel()
 
 	filter := bson.D{{Key: "_id", Value: commentID}}
-	res, err := cc.db.Collection("comments").DeleteOne(cx, filter)
+
+	col := cc.client.Database("cross").Collection("comments")
+	res, err := col.DeleteOne(cx, filter)
 
 	if err != nil {
 		log.Error(err)
@@ -72,7 +76,8 @@ func (cc CommentClient) UpdateComment(c context.Context, update bson.D, commentI
 
 	filter := bson.D{{Key: "_id", Value: commentID}}
 
-	res, err := cc.db.Collection("comments").UpdateOne(cx, filter, update)
+	col := cc.client.Database("cross").Collection("comments")
+	res, err := col.UpdateOne(cx, filter, update)
 
 	if err != nil {
 		log.Error(err)
@@ -93,7 +98,9 @@ func (cc CommentClient) IncrementLike(c context.Context, commentID primitive.Obj
 	filter := bson.D{{Key: "_id", Value: commentID}}
 	update := bson.D{{Key: "$inc", Value: bson.D{{Key: "likes", Value: 1}}}}
 
-	res, err := cc.db.Collection("comments").UpdateOne(cx, filter, update)
+	col := cc.client.Database("cross").Collection("comments")
+
+	res, err := col.UpdateOne(cx, filter, update)
 
 	if err != nil {
 		log.Error(err)
@@ -114,7 +121,9 @@ func (cc CommentClient) DecrementLike(c context.Context, commentID primitive.Obj
 	filter := bson.D{{Key: "_id", Value: commentID}}
 	update := bson.D{{Key: "$inc", Value: bson.D{{Key: "likes", Value: -1}}}}
 
-	res, err := cc.db.Collection("comments").UpdateOne(cx, filter, update)
+	col := cc.client.Database("cross").Collection("comments")
+
+	res, err := col.UpdateOne(cx, filter, update)
 
 	if err != nil {
 		log.Error(err)

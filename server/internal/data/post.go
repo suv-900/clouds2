@@ -18,11 +18,12 @@ type Post struct {
 	Content    string
 	AuthorID   uint64
 	Authorname string
+
+	// Comments []Comment
 }
 
 type PostClient struct {
 	client *mongo.Client
-	db     *mongo.Database
 }
 
 func (p PostClient) AddPost(c context.Context, post *Post) (int64, error) {
@@ -31,7 +32,9 @@ func (p PostClient) AddPost(c context.Context, post *Post) (int64, error) {
 
 	var postID int64
 
-	res, err := p.db.Collection("posts").InsertOne(cx, post)
+	col := p.client.Database("cross").Collection("posts")
+
+	res, err := col.InsertOne(cx, post)
 	if err != nil {
 		log.Error(err)
 		return postID, ErrInternalServerError
@@ -53,7 +56,10 @@ func (p PostClient) GetPost(c context.Context, postID primitive.ObjectID) (Post,
 	filter := bson.D{{Key: "_id", Value: postID}}
 
 	var post Post
-	err := p.db.Collection("posts").FindOne(cx, filter).Decode(&post)
+
+	col := p.client.Database("cross").Collection("posts")
+
+	err := col.FindOne(cx, filter).Decode(&post)
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -71,7 +77,8 @@ func (p PostClient) CheckPostTitleExists(c context.Context, post_title string) (
 
 	filter := bson.D{{Key: "post_title", Value: post_title}}
 
-	res := p.db.Collection("posts").FindOne(cx, filter)
+	col := p.client.Database("cross").Collection("posts")
+	res := col.FindOne(cx, filter)
 
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
@@ -89,7 +96,10 @@ func (p PostClient) UpdatePost(c context.Context, update bson.D, postID primitiv
 
 	opts := options.Update()
 	filter := bson.D{{Key: "_id", Value: postID}}
-	res, err := p.db.Collection("posts").UpdateOne(cx, filter, update, opts)
+
+	col := p.client.Database("cross").Collection("posts")
+
+	res, err := col.UpdateOne(cx, filter, update, opts)
 
 	if err != nil {
 		log.Error(err)
@@ -110,7 +120,9 @@ func (p PostClient) DeletePost(c context.Context, postID primitive.ObjectID) err
 	opts := options.Delete()
 	filter := bson.D{{Key: "_id", Value: postID}}
 
-	res, err := p.db.Collection("posts").DeleteOne(cx, filter, opts)
+	col := p.client.Database("cross").Collection("posts")
+
+	res, err := col.DeleteOne(cx, filter, opts)
 
 	if err != nil {
 		log.Error(err)
@@ -136,7 +148,8 @@ func (p PostClient) GetPostsByAuthorID(c context.Context, authorID int64, offset
 
 	opts := options.Find().SetLimit(5).SetSkip(offset)
 
-	cursor, err := p.db.Collection("posts").Find(cx, filter, opts)
+	col := p.client.Database("cross").Collection("posts")
+	cursor, err := col.Find(cx, filter, opts)
 
 	if err != nil {
 		log.Error(err)
@@ -158,7 +171,8 @@ func (p PostClient) IncrementLike(c context.Context, postID primitive.ObjectID) 
 	filter := bson.D{{Key: "_id", Value: postID}}
 	update := bson.D{{Key: "$inc", Value: bson.D{{Key: "likes", Value: 1}}}}
 
-	res, err := p.db.Collection("posts").UpdateOne(cx, filter, update, opts)
+	col := p.client.Database("cross").Collection("posts")
+	res, err := col.UpdateOne(cx, filter, update, opts)
 
 	if err != nil {
 		log.Error(err)
@@ -178,7 +192,8 @@ func (p PostClient) DecrementLike(c context.Context, postID primitive.ObjectID) 
 	filter := bson.D{{Key: "_id", Value: postID}}
 	update := bson.D{{Key: "$inc", Value: bson.D{{Key: "likes", Value: -1}}}}
 
-	res, err := p.db.Collection("posts").UpdateOne(cx, filter, update, opts)
+	col := p.client.Database("cross").Collection("posts")
+	res, err := col.UpdateOne(cx, filter, update, opts)
 
 	if err != nil {
 		log.Error(err)
