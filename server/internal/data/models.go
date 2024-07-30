@@ -1,6 +1,7 @@
 package data
 
 import (
+	"cloud/internal/logger"
 	"context"
 	"errors"
 	"time"
@@ -19,6 +20,8 @@ var (
 )
 
 const context_timeout = 5 * time.Second
+
+var log = logger.GetLogger()
 
 type Models struct {
 	Users interface {
@@ -51,10 +54,31 @@ type Models struct {
 }
 
 // remove db
-func GetModels(gd *gorm.DB, mc *mongo.Client) Models {
+func GetModels(gd *gorm.DB, mc *mongo.Client) (Models, error) {
+
+	err := pg_migration(gd)
+	if err != nil {
+		return Models{}, err
+	}
+
 	return Models{
 		Users:    UserClient{db: gd},
-		Posts:    PostClient{client: mc, db: mc.Database("cross")},
-		Comments: CommentClient{client: mc, db: mc.Database("cross")},
+		Posts:    PostClient{client: mc},
+		Comments: CommentClient{client: mc},
+	}, nil
+}
+
+func pg_migration(db *gorm.DB) error {
+
+	if err := db.AutoMigrate(&User{}); err != nil {
+		log.Error(err)
+		return ErrInternalServerError
 	}
+
+	if err := db.Migrator().CreateIndex(&User{}, "name"); err != nil {
+		log.Error(err)
+		return ErrInternalServerError
+	}
+
+	return nil
 }
